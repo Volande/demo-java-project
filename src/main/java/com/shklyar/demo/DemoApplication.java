@@ -10,8 +10,6 @@ public class DemoApplication {
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(DemoApplication.class, args);
-		PasswordEncoder encoder = context.getBean(PasswordEncoder.class);
-		System.out.println(encoder.encode("passx"));
 	}
 
 }

@@ -1,65 +1,51 @@
 package com.shklyar.demo.service;
 
-
 import com.shklyar.demo.dao.UserRepository;
 import com.shklyar.demo.dto.UserDTO;
-
-import com.shklyar.demo.entities.Role;
-
-
 import com.shklyar.demo.entities.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 @Service
-
 public class UserServiceImpl implements UserService{
 
-
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+
+        this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
     }
 
+    private UserRepository userRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Override
-    public boolean save(UserDTO userDTO) {
-        if(!Objects.equals(userDTO.getPassword(), userDTO.getMatchingPassword())){
-            throw new RuntimeException("Password is not equals");
+
+    public User save(User user, boolean isAlreadyEncoded) {
+        if(!isAlreadyEncoded){
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         }
-        User user = User.builder()
-                .name(userDTO.getUsername())
-                .password(passwordEncoder.encode(userDTO.getPassword()))
-                .role(Role.CLIENT)
-                .build();
-        userRepository.save(user);
-            return true;
+
+        return userRepository.save(user);
+    }
+
+    public User save(User user) {
+        return save(user,false);
+    }
+
+    public User save(UserDTO user) {
+        return save(new User(user.getUsername(),user.getPassword()));
+    }
+
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findFirstByName(username);
-        if (user == null)
-            throw new RuntimeException("User not found with name:" + username);
-
-        List<GrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority(user.getRole().name()));
-
-        return  new org.springframework.security.core.userdetails.User(
-                user.getName(),
-                user.getPassword(),
-                roles
-        );
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
+    {
+        return userRepository.findFirstByUsername(username);
     }
 }

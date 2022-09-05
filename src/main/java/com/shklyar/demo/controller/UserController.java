@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
 
@@ -26,12 +26,15 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public String saveUser(UserDTO dto,Model model){
+    public String saveUser(UserDTO dto){
+        /*
         if(userService.save(dto)){
             return "redirect:/";
         }else {
-            model.addAttribute("user, dto");
+            //model.addAttribute("user, dto");
             return "user";
         }
+        */
+        return "test";
     }
 }
