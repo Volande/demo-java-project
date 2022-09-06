@@ -39,10 +39,6 @@ public class UserServiceImpl implements UserService{
         return save(new User(user.getUsername(),user.getPassword()));
     }
 
-    public void delete(User user) {
-        userRepository.delete(user);
-    }
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
