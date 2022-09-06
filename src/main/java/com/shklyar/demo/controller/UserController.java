@@ -1,13 +1,18 @@
 package com.shklyar.demo.controller;
 
 import com.shklyar.demo.dto.UserDTO;
+import com.shklyar.demo.entities.Product;
 import com.shklyar.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/user")
@@ -26,15 +31,8 @@ public class UserController {
     }
 
     @PostMapping("/new")
-    public String saveUser(UserDTO dto){
-        /*
-        if(userService.save(dto)){
-            return "redirect:/";
-        }else {
-            //model.addAttribute("user, dto");
-            return "user";
-        }
-        */
-        return "test";
+    public ResponseEntity<String> saveUser(UserDTO userDTO){
+
+        return new ResponseEntity("OK TEST String", HttpStatus.OK);
     }
 }
