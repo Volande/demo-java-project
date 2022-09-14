@@ -19,11 +19,23 @@ public class User implements UserDetails
 {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
-   private long userId;
+   private Long userId;
 
    @NonNull
    @Size(max = 20)
    private String username;
+
+   @NonNull
+   @Size(max = 20)
+   private String firstName;
+
+   @NonNull
+   @Size(max = 20)
+   private String lastName;
+
+   @NonNull
+   @Size(max = 20)
+   private String email;
 
    @NonNull
    @Size(max = 20)
@@ -36,9 +48,12 @@ public class User implements UserDetails
    private Backet backet;
 
 
-   public User(String username, String password)
+   public User(String username, String firstName,String lastName, String email, String password, Role role)
    {
       this.username = username;
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.email = email;
       this.password = password;
       this.role = Role.CLIENT;
       this.backet = null;
@@ -74,4 +89,6 @@ public class User implements UserDetails
    {
       return true;
    }
+
+
 }
