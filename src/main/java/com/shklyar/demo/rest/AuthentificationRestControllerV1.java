@@ -1,7 +1,6 @@
 package com.shklyar.demo.rest;
 
 import com.shklyar.demo.dao.UserRepository;
-import com.shklyar.demo.dto.UserDTO;
 import com.shklyar.demo.entities.User;
 import com.shklyar.demo.security.jwt.JwtTokenProvider;
 import com.shklyar.demo.service.UserService;

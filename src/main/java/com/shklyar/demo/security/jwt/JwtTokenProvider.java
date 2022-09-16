@@ -17,11 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -49,6 +47,10 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         secret = Base64.getEncoder().encodeToString(secret.getBytes());
+
+        while(secret.getBytes().length<256){
+            secret = secret + Base64.getEncoder().encodeToString(secret.getBytes());
+        }
     }
 
     public String createToken(String username, Role role) {
@@ -58,13 +60,44 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-        return Jwts.builder()//
-                .setClaims(claims)//
-                .setIssuedAt(now)//
-                .setExpiration(validity)//
-                .signWith(SignatureAlgorithm.HS256, secret)//
+
+        Random rd = new Random();
+        byte[] arr = new byte[256];
+        rd.nextBytes(arr);
+
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
+
+  /*  SecretKey key = new SecretKey()
+    {
+        @Override
+        public String getAlgorithm()
+        {
+            return "HmacSHA512";
+        }
+
+        @Override
+        public String getFormat()
+        {
+            return "ASN.1";
+        }
+
+        @Override
+        public byte[] getEncoded()
+        {
+            Random rd = new Random();
+            byte[] arr = new byte[256];
+            rd.nextBytes(arr);
+            return arr;
+        }
+    };*/
+
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));

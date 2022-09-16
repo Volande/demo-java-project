@@ -1,7 +1,7 @@
 package com.shklyar.demo.service;
 
 import com.shklyar.demo.dao.UserRepository;
-import com.shklyar.demo.dto.UserDTO;
+import com.shklyar.demo.dto.AdminUserDTO;
 import com.shklyar.demo.entities.Role;
 import com.shklyar.demo.entities.User;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +39,10 @@ public class UserServiceImpl implements UserService{
         return save(user,false);
     }
 
-    public User save(UserDTO user) {
-        return save(new User(user.getUsername(),
+    public User save(AdminUserDTO user) {
+        return save(new User(
+                user.getUserId(),
+                user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
@@ -66,6 +68,18 @@ public class UserServiceImpl implements UserService{
         return result;
     }
 
+    @Override
+    public User findById(Long userId) {
+        User result = userRepository.findById(userId).orElse(null);
+
+        if (result == null) {
+            log.warn("IN findById - no user found by id: {}", userId);
+            return null;
+        }
+
+        log.info("IN findById - user: {} found by id: {}", result);
+        return result;
+    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {

@@ -48,8 +48,9 @@ public class User implements UserDetails
    private Backet backet;
 
 
-   public User(String username, String firstName,String lastName, String email, String password, Role role)
+   public User(Long userId, String username, String firstName,String lastName, String email, String password, Role role)
    {
+      this.userId = userId;
       this.username = username;
       this.firstName = firstName;
       this.lastName = lastName;
