@@ -44,7 +44,6 @@ public class User implements UserDetails
    private String password;
 
    @ManyToMany(cascade = CascadeType.ALL)
-
    @JoinTable(name = "roles",
            joinColumns = @JoinColumn(name = "userId"),
            inverseJoinColumns = @JoinColumn(name = "roleId")
@@ -100,6 +99,7 @@ public class User implements UserDetails
    {
       return true;
    }
+
 
 
 }
