@@ -7,9 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -43,12 +41,9 @@ public class User implements UserDetails
    @Size(max = 20)
    private String password;
 
-   @ManyToMany(cascade = CascadeType.ALL)
-   @JoinTable(name = "roles",
-           joinColumns = @JoinColumn(name = "userId"),
-           inverseJoinColumns = @JoinColumn(name = "roleId")
-   )
-   private List<Role> roles = new ArrayList<>();
+   @ManyToOne
+   @JoinColumn(name = "user_role")
+   private Role role;
 
 
 
@@ -56,7 +51,7 @@ public class User implements UserDetails
    private Backet backet;
 
 
-   public User(Long userId, String username, String firstName,String lastName, String email, String password, List<Role> roles)
+   public User(Long userId, String username, String firstName,String lastName, String email, String password, Role role)
    {
       this.userId = userId;
       this.username = username;
@@ -64,7 +59,7 @@ public class User implements UserDetails
       this.lastName = lastName;
       this.email = email;
       this.password = password;
-      this.roles = roles;
+      this.role = role;
       this.backet = null;
    }
 
@@ -72,8 +67,7 @@ public class User implements UserDetails
    @Override
    public Collection<? extends GrantedAuthority> getAuthorities()
    {
-
-      return roles;
+      return null;
    }
 
    @Override
@@ -99,7 +93,6 @@ public class User implements UserDetails
    {
       return true;
    }
-
 
 
 }

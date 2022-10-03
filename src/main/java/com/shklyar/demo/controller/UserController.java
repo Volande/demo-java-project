@@ -1,6 +1,6 @@
 package com.shklyar.demo.controller;
 
-import com.shklyar.demo.dto.AdminUserDTO;
+import com.shklyar.demo.dto.ClientUserDTO;
 import com.shklyar.demo.entities.User;
 import com.shklyar.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,20 @@ public class UserController {
     */
 
     @PostMapping("/newUser")
-    public ResponseEntity<String> saveUser(AdminUserDTO userDTO){
+    public ResponseEntity<String> saveUser(ClientUserDTO userDTO){
+
+
+
+
+
+
+
+
+
+
+
+
+
         User user = userService.save(userDTO);
         return new ResponseEntity(user.getUserId(), HttpStatus.OK);
     }

@@ -3,7 +3,6 @@ package com.shklyar.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.shklyar.demo.entities.Role;
-import com.shklyar.demo.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,15 +13,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AdminUserDTO {
+public class ClientUserDTO {
     private Long userId;
     private String username;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-    private Role role;
 
+    /*
     public User toUser(){
         User user = new User();
         user.setUserId(userId);
@@ -30,11 +29,12 @@ public class AdminUserDTO {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
-        user.setRole(role);
+        user.setAuthorities(new ArrayList<Role>(role));
+
 
         return user;
-    }
-
+    }*/
+/*
     public static AdminUserDTO fromUser(User user){
         AdminUserDTO adminUserDTO = new AdminUserDTO();
         adminUserDTO.setUserId(user.getUserId());
@@ -46,4 +46,5 @@ public class AdminUserDTO {
 
         return adminUserDTO;
     }
+    */
 }

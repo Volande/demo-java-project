@@ -1,6 +1,5 @@
 package com.shklyar.demo.controller;
 
-import com.shklyar.demo.dto.AdminUserDTO;
 import com.shklyar.demo.entities.User;
 import com.shklyar.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +17,13 @@ public class AdminAction {
     private UserService userService;
 
     @GetMapping(value = "users/{userId}")
-    public ResponseEntity<AdminUserDTO> getUserById(@PathVariable(name = "userId") Long userId){
+    public ResponseEntity<User> getUserById(@PathVariable(name = "userId") Long userId){
         User user = userService.findById(userId);
 
         if(user == null){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
-        AdminUserDTO result = AdminUserDTO.fromUser(user);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }

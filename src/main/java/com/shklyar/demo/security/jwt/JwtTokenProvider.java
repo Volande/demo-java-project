@@ -2,6 +2,7 @@ package com.shklyar.demo.security.jwt;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.util.EnumValues;
+import com.shklyar.demo.entities.Authorities;
 import com.shklyar.demo.entities.Role;
 import com.shklyar.demo.security.JwtUserDetailsService;
 import io.jsonwebtoken.*;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,9 +55,9 @@ public class JwtTokenProvider {
         }
     }
 
-    public String createToken(String username, List<Role> roles) {
+    public String createToken(String username, Role role) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("roles", roles);
+        claims.put("roles", role);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);

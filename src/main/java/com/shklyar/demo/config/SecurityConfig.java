@@ -36,10 +36,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
 
-    private JwtRequestFilter jwtRequestFilter;
 
    @Override
    protected void configure(HttpSecurity http) throws Exception{
+
        http
                .cors().disable()
                .csrf().disable()
@@ -48,16 +48,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                .and()
                .authorizeRequests()
                .antMatchers(LOGIN_ENDPOINT).permitAll()
-               .antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
-               .antMatchers(ADMIN_TEST).hasRole("ADMIN")
+               .antMatchers(ADMIN_ENDPOINT).hasAuthority("ADMIN")
+               .antMatchers(ADMIN_TEST).hasAuthority("ADMIN")
                .and()
                .apply(new JwtConfigurer(jwtTokenProvider));
    }
-
-
-
-
-
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
