@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("user")
+@RequestMapping("/user")
 public class UserController {
     private final UserService userService;
 
@@ -29,19 +29,6 @@ public class UserController {
 
     @PostMapping("/newUser")
     public ResponseEntity<String> saveUser(ClientUserDTO userDTO){
-
-
-
-
-
-
-
-
-
-
-
-
-
         User user = userService.save(userDTO);
         return new ResponseEntity(user.getUserId(), HttpStatus.OK);
     }

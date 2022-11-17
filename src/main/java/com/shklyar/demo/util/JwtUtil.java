@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,10 +18,25 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-   private String SECRET_KEY = "d4 c7 48 f5 c5 90 20 a4 0f 22 c4 78 c7 e6 55 e7";
+   @Value("${jwt.token.secret}")
+   private String secret;
 
    @Value("${token-lifetime}")
    private int tokenLifetime;
+
+
+
+   @PostConstruct
+   protected void init() {
+      secret = Base64.getEncoder().encodeToString(secret.getBytes());
+
+      while(secret.getBytes().length<256){
+         secret = secret + Base64.getEncoder().encodeToString(secret.getBytes());
+      }
+      System.out.println(secret);
+   }
+
+
 
    public String extractUsername(String token) {
       return extractClaim(token, Claims::getSubject);
@@ -35,7 +52,7 @@ public class JwtUtil {
    }
 
    private Claims extractAllClaims(String token) {
-      return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+      return Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(token).getBody();
    }
 
    public Boolean isTokenExpired(String token) {
@@ -53,7 +70,7 @@ public class JwtUtil {
               .setSubject(subject)
               .setIssuedAt(new Date(System.currentTimeMillis()))
               .setExpiration(new Date(System.currentTimeMillis() +tokenLifetime))
-              .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+              .signWith(SignatureAlgorithm.HS256, secret).compact();
    }
 
    public boolean validateToken(String token, UserDetails userDetails) {

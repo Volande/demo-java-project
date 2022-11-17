@@ -53,6 +53,7 @@ public class JwtTokenProvider {
         while(secret.getBytes().length<256){
             secret = secret + Base64.getEncoder().encodeToString(secret.getBytes());
         }
+        System.out.println(secret);
     }
 
     public String createToken(String username, Role role) {
@@ -126,7 +127,7 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer_")) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7, bearerToken.length());
         }
         return null;

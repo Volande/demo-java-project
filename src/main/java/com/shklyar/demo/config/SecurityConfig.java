@@ -24,34 +24,38 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final JwtTokenProvider jwtTokenProvider;
-
-    private static final String ADMIN_ENDPOINT = "/api/v1/admin/***";
-    private static final String ADMIN_TEST="/admin/**";
+    private static final String ADMIN_ENDPOINT = "/api/v1/admin/";
+    private static final String ADMIN_TEST="/admin/";
     private  static final String LOGIN_ENDPOINT = "/api/v1/auth/**";
-    @Autowired
-    public SecurityConfig(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+
+   @Autowired
+   public SecurityConfig(JwtRequestFilter jwtRequestFilter) {
+      this.jwtRequestFilter = jwtRequestFilter;
+   }
+
+
+
+   final private JwtRequestFilter jwtRequestFilter;
 
 
 
 
    @Override
-   protected void configure(HttpSecurity http) throws Exception{
+   protected void configure(HttpSecurity http) throws Exception {
+      http.cors().and().csrf()
+              .disable()
+              .authorizeRequests()
+              .antMatchers(LOGIN_ENDPOINT).permitAll()
+              .antMatchers("/user/**").permitAll()
+              .antMatchers(ADMIN_ENDPOINT).hasAuthority("ADMIN")
+              .antMatchers(ADMIN_TEST).hasAuthority("ADMIN")
+              .antMatchers("/products/**").hasRole("ADMIN")
+              .anyRequest().authenticated()
 
-       http
-               .cors().disable()
-               .csrf().disable()
-               .httpBasic().disable()
-               .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-               .and()
-               .authorizeRequests()
-               .antMatchers(LOGIN_ENDPOINT).permitAll()
-               .antMatchers(ADMIN_ENDPOINT).hasAuthority("ADMIN")
-               .antMatchers(ADMIN_TEST).hasAuthority("ADMIN")
-               .and()
-               .apply(new JwtConfigurer(jwtTokenProvider));
+
+              .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+      http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
    }
 
     @Bean
