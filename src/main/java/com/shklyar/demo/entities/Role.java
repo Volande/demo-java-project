@@ -12,21 +12,21 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Role
+public class Role implements GrantedAuthority
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(name = "role_name", length = 50)
-    private String role;
+    private String authority;
 
 
     @Override
     public String toString() {
         return "Role{" +
                 "id=" + id +
-                ", role='" + role + '\'' +
+                ", authority ='" + authority + '\'' +
                 '}';
     }
 }

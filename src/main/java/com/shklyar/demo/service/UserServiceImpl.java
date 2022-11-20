@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService{
                   user.getLastName(),
                   user.getEmail(),
                   user.getPassword(),
-                  roleRepository.findByRole("USER")));
+                  roleRepository.findByAuthority("USER")));
        }
 
        private List<Role> toRolesObjects(List<String> stringRoles){

@@ -3,15 +3,14 @@ package com.shklyar.demo.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.shklyar.demo.entities.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClientUserDTO {
     private Long userId;

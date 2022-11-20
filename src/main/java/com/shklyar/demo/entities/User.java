@@ -67,7 +67,11 @@ public class User implements UserDetails
    @Override
    public Collection<? extends GrantedAuthority> getAuthorities()
    {
-      return null;
+       ArrayList<Role> result = new ArrayList<>();
+
+       result.add(role);
+
+       return result;
    }
 
    @Override
