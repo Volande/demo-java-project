@@ -24,8 +24,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String ADMIN_ENDPOINT = "/api/v1/admin/";
-    private static final String ADMIN_TEST="/admin/";
+    private static final String ADMIN_ENDPOINT = "/api/v1/admin/**";
+
     private  static final String LOGIN_ENDPOINT = "/api/v1/auth/**";
 
    @Autowired
@@ -47,8 +47,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
               .authorizeRequests()
               .antMatchers(LOGIN_ENDPOINT).permitAll()
               .antMatchers("/user/**").permitAll()
-              .antMatchers(ADMIN_ENDPOINT).hasAuthority("ADMIN")
-              .antMatchers(ADMIN_TEST).hasAuthority("ADMIN")
               .antMatchers("/products/**").hasAuthority("ADMIN")
               .anyRequest().permitAll()
 
