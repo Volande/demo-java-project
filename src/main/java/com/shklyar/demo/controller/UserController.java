@@ -20,12 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    /* @PostMapping("/newUser")
-    public String newUser(Model model){
-    model.addAttribute("user", new UserDTO());
-    return "user";
-    }
-    */
+
 
     @PostMapping("/newUser")
     public ResponseEntity<String> saveUser(ClientUserDTO userDTO){
