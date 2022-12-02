@@ -37,8 +37,8 @@ public class ProductController
    }
 
    @GetMapping("/filter")
-   public @ResponseBody
-   ResponseEntity<List<Product>> findProduct(String title){
+   @ResponseBody
+   public ResponseEntity<List<Product>> findProduct(@RequestParam  String title){
       List<Product> product = productService.findProduct(title);
       return new ResponseEntity<>(product, HttpStatus.OK);
    }
