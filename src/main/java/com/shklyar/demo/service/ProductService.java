@@ -23,6 +23,8 @@ import java.util.Map;
 @Service
 public class ProductService {
 
+    private String predicateValuePrice;
+
     @Autowired
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
@@ -41,7 +43,9 @@ public class ProductService {
 
 
     public List<Product> findProduct(String productParamets) {
+
         try {
+
             return productRepository.findAll(mapProduct(productParamets));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
@@ -51,6 +55,7 @@ public class ProductService {
 
 
     public Specification<Product> mapProduct(String string) throws JsonProcessingException {
+
         ObjectMapper mapper = new ObjectMapper();
         Map<String, String> map;
 
@@ -62,6 +67,7 @@ public class ProductService {
     private Specification<Product> predicateForProducts(Map<String, String> map) {
 
         return new Specification<Product>() {
+
             @Override
             public Predicate toPredicate(Root<Product> root,
                                          CriteriaQuery<?> query,
@@ -71,14 +77,24 @@ public class ProductService {
                 List<Predicate> productPredicateList = new ArrayList<>();
 
                 for (Map.Entry<String, String> entry : map.entrySet()) {
+                    if(entry.getKey().equals("price")){
+                        predicateValuePrice = entry.getValue();
+                        int a = predicateValuePrice.indexOf(",");
+                        System.out.println(a);
+                        String minPrice = predicateValuePrice.substring(0,a);
+                        String maxPrice = predicateValuePrice.substring(a);
+                        productPredicateList.remove(entry.getValue());
 
-                    productPredicateList.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
-                }
-
+                    }
+                    else{  productPredicateList.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
+                }}
 
                 return criteriaBuilder.and(productPredicateList.toArray(new Predicate[0]));
             }
+            
         };
+
     }
+
 
 }
