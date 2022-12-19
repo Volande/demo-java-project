@@ -24,6 +24,8 @@ import java.util.Map;
 public class ProductService {
 
     private String predicateValuePrice;
+    public int minPrice;
+    public int maxPrice;
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
@@ -76,22 +78,30 @@ public class ProductService {
 
                 List<Predicate> productPredicateList = new ArrayList<>();
 
+
                 for (Map.Entry<String, String> entry : map.entrySet()) {
-                    if(entry.getKey().equals("price")){
+                    if (entry.getKey().equals("price")) {
                         predicateValuePrice = entry.getValue();
                         int a = predicateValuePrice.indexOf(",");
-                        System.out.println(a);
-                        String minPrice = predicateValuePrice.substring(0,a);
-                        String maxPrice = predicateValuePrice.substring(a);
+                        minPrice = Integer.parseInt(predicateValuePrice.substring(0, a).trim());
+                        maxPrice = Integer.parseInt(predicateValuePrice.substring(a + 1).trim());
+                        System.out.println(maxPrice);
+                        System.out.println(minPrice);
                         productPredicateList.remove(entry.getValue());
+                    }else if(entry.getKey().equals("categories")){
+                        productPredicateList.remove(entry.getValue());
+                    }else {
+
+                        productPredicateList.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
 
                     }
-                    else{  productPredicateList.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
-                }}
+                    productPredicateList.add(criteriaBuilder.between(root.get("price"),minPrice,maxPrice));
+                }
+
 
                 return criteriaBuilder.and(productPredicateList.toArray(new Predicate[0]));
             }
-            
+
         };
 
     }

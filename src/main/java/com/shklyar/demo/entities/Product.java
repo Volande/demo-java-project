@@ -23,6 +23,7 @@ public class Product {
     private String title;
     private BigDecimal price;
     private String size;
+    private String availability;
 
     @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable( name = "produts_categories",
