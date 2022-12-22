@@ -4,20 +4,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shklyar.demo.dao.ProductRepository;
+import com.shklyar.demo.entities.Category;
+import com.shklyar.demo.entities.Category_;
 import com.shklyar.demo.entities.Product;
+import com.shklyar.demo.entities.Product_;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.shklyar.demo.entities.Category_.userId;
 
 
 @Service
@@ -63,6 +65,9 @@ public class ProductService {
 
         map = mapper.readValue(string, Map.class);
 
+        ObjectMapper mapperCategories = new ObjectMapper();
+        Map<String, String> mapCategories;
+
         return predicateForProducts(map);
     }
 
@@ -77,6 +82,8 @@ public class ProductService {
 
 
                 List<Predicate> productPredicateList = new ArrayList<>();
+                Join<Product, Category> predicateCategory = null;
+
 
 
                 for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -85,17 +92,20 @@ public class ProductService {
                         int a = predicateValuePrice.indexOf(",");
                         minPrice = Integer.parseInt(predicateValuePrice.substring(0, a).trim());
                         maxPrice = Integer.parseInt(predicateValuePrice.substring(a + 1).trim());
-                        System.out.println(maxPrice);
-                        System.out.println(minPrice);
                         productPredicateList.remove(entry.getValue());
                     }else if(entry.getKey().equals("categories")){
+                        predicateCategory = root.join("categories");
+                        productPredicateList.add(criteriaBuilder.equal(predicateCategory.get("userId"),userId));
                         productPredicateList.remove(entry.getValue());
                     }else {
+
 
                         productPredicateList.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
 
                     }
+
                     productPredicateList.add(criteriaBuilder.between(root.get("price"),minPrice,maxPrice));
+
                 }
 
 
