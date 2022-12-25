@@ -82,10 +82,9 @@ public class ProductService {
 
 
                 List<Predicate> productPredicateList = new ArrayList<>();
+
                 CriteriaQuery<Product> criteriaQuery = criteriaBuilder.createQuery(Product.class);
-                // FROM
                 Root<Product> category = criteriaQuery.from(Product.class);
-                // SELECT
                 criteriaQuery.select(category);
 
 
@@ -99,7 +98,7 @@ public class ProductService {
                         productPredicateList.remove(entry.getValue());
                     }else if(entry.getKey().equals("categories")){
                         Join<Product ,Category> predicateCategory = category.join("categories");
-                        Predicate in = criteriaBuilder.equal(predicateCategory.get("userId"),userId);
+                        Predicate in = predicateCategory.get("title").in(entry.getValue());
                         productPredicateList.add(in);
                         productPredicateList.remove(entry.getValue());
                     }else {
