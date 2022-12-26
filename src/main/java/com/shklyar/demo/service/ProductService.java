@@ -114,6 +114,7 @@ public class ProductService {
                 }
 
                 if (map.containsKey("categories"))
+
                 {
                     Join<Product, Category> predicateCategory = root.join("categories");
 
