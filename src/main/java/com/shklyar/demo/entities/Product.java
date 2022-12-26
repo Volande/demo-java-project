@@ -21,9 +21,9 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long userId;
     private String title;
-    private BigDecimal price;
+    private Double price;
     private String size;
-    private String availability;
+    private Boolean availability;
 
     @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable( name = "produts_categories",
