@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class OrderDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long userId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn( name = "order_id")

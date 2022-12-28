@@ -20,30 +20,4 @@ public class ClientUserDTO {
     private String email;
     private String password;
 
-    /*
-    public User toUser(){
-        User user = new User();
-        user.setUserId(userId);
-        user.setUsername(username);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setAuthorities(new ArrayList<Role>(role));
-
-
-        return user;
-    }*/
-/*
-    public static AdminUserDTO fromUser(User user){
-        AdminUserDTO adminUserDTO = new AdminUserDTO();
-        adminUserDTO.setUserId(user.getUserId());
-        adminUserDTO.setUsername(user.getUsername());
-        adminUserDTO.setFirstName(user.getFirstName());
-        adminUserDTO.setLastName(user.getLastName());
-        adminUserDTO.setEmail(user.getEmail());
-        adminUserDTO.setRole(user.getRole());
-
-        return adminUserDTO;
-    }
-    */
 }

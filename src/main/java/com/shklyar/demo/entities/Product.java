@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -19,7 +18,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long userId;
+    private Long id;
     private String title;
     private Double price;
     private String size;
@@ -30,4 +29,8 @@ public class Product {
             joinColumns = @JoinColumn( name = "products_id"),
             inverseJoinColumns = @JoinColumn( name ="category_id" ))
     private List<Category> categories;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "collection_id")
+    private Collection collection;
 }

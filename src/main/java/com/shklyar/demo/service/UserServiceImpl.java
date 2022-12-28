@@ -57,18 +57,8 @@ public class UserServiceImpl implements UserService{
                   roleRepository.findByAuthority("USER")));
        }
 
-       private List<Role> toRolesObjects(List<String> stringRoles){
 
 
-          return null;
-
-       }
-
-
-
-    public User register(User user) {
-        return save(user,false);
-    }
 
 
     public User findByUsername(String username) {

@@ -1,25 +1,19 @@
 package com.shklyar.demo.security.jwt;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.util.EnumValues;
-import com.shklyar.demo.entities.Authorities;
 import com.shklyar.demo.entities.Role;
 import com.shklyar.demo.security.JwtUserDetailsService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
@@ -76,31 +70,6 @@ public class JwtTokenProvider {
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
-
-  /*  SecretKey key = new SecretKey()
-    {
-        @Override
-        public String getAlgorithm()
-        {
-            return "HmacSHA512";
-        }
-
-        @Override
-        public String getFormat()
-        {
-            return "ASN.1";
-        }
-
-        @Override
-        public byte[] getEncoded()
-        {
-            Random rd = new Random();
-            byte[] arr = new byte[256];
-            rd.nextBytes(arr);
-            return arr;
-        }
-    };*/
-
 
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));

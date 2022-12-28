@@ -24,7 +24,7 @@ public class Backet {
     @JoinColumn( name = "user_id")
     private User user;
 
-    @ManyToMany
+   @ManyToMany
     @JoinTable( name = "buckets_produts",
         joinColumns = @JoinColumn( name = "buckets_id"),
         inverseJoinColumns = @JoinColumn( name ="product_id" ))

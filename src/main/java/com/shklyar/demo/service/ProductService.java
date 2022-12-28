@@ -1,26 +1,22 @@
 package com.shklyar.demo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.entities.Category;
-import com.shklyar.demo.entities.Category_;
+import com.shklyar.demo.entities.Collection;
 import com.shklyar.demo.entities.Product;
-import com.shklyar.demo.entities.Product_;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
 import javax.persistence.criteria.*;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.shklyar.demo.entities.Category_.userId;
+
 
 
 @Service
@@ -126,26 +122,27 @@ public class ProductService {
                     }
                 }
 
-/*            for (Map.Entry<String, String> entry : map.entrySet())
-            {
+                if (map.containsKey("title"))
+                {
+                    productPredicateList.add(criteriaBuilder.equal(root.get("title"),map.get("title")));
+                }
 
-               if (entry.getKey().equals("categories"))
-               {
-                  Join<Product, Category> predicateCategory = category.join("categories");
-                  Predicate in = predicateCategory.get("title").in(entry.getValue());
-                  productPredicateList.add(in);
-                  productPredicateList.remove(entry.getValue());
-               }
-               else
-               {
+                if (map.containsKey("size"))
+                {
+                    productPredicateList.add(criteriaBuilder.equal(root.get("size"),map.get("size")));
+                }
 
-                  productPredicateList.add(criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue()));
+                if (map.containsKey("collection"))
 
-               }
+                {
+                    Join<Product, Collection> predicateCollection = root.join("collection");
 
-               productPredicateList.add(criteriaBuilder.between(root.get("price"), minPrice, maxPrice));
+                    String collection = (String) map.get("collection");
 
-            }*/
+                    productPredicateList.add(predicateCollection.get("title").in(collection));
+
+                }
+
 
 
                 return criteriaBuilder.and(productPredicateList.toArray(new Predicate[0]));

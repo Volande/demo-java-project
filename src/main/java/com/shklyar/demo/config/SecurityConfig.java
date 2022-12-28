@@ -33,11 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       this.jwtRequestFilter = jwtRequestFilter;
    }
 
-
-
    final private JwtRequestFilter jwtRequestFilter;
-
-
 
 
    @Override
@@ -46,6 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
               .disable()
               .authorizeRequests()
               .antMatchers(LOGIN_ENDPOINT).permitAll()
+              .antMatchers(ADMIN_ENDPOINT).hasAuthority("ADMIN")
               .anyRequest().permitAll()
 
 

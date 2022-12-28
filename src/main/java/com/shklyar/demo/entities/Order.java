@@ -21,7 +21,7 @@ import java.util.List;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long userId;
+    private Long id;
 
     @CreationTimestamp
     private LocalDateTime created;
@@ -30,7 +30,7 @@ public class Order {
     private LocalDateTime update;
 
     @ManyToOne
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "user_id")
     private User user;
     private BigDecimal sum;
     private String address;
