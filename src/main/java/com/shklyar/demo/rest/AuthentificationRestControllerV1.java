@@ -52,9 +52,11 @@ public class AuthentificationRestControllerV1 implements AuthenticationManager{
             }
 
             String token = jwtTokenProvider.createToken(username,user.getRole());
+            String role = user.getRole().getAuthority();
 
             Map<Object, Object> response = new HashMap<>();
             response.put("username", username);
+            response.put("role", role);
             response.put("token", token);
 
             return ResponseEntity.ok(response);

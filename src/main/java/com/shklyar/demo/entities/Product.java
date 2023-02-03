@@ -1,9 +1,6 @@
 package com.shklyar.demo.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -22,7 +19,7 @@ public class Product {
     private  Long id;
     private String title;
     private Double price;
-    private String size;
+
     private Boolean availability;
     private String content;
     private String compound;
@@ -31,6 +28,9 @@ public class Product {
     @JoinColumn(name = "product_id")
     private List<Images> image;
 
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
+    private List<Sizes> size;
 
     @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable( name = "produts_categories",

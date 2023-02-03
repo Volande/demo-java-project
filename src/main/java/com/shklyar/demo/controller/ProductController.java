@@ -34,7 +34,7 @@ public class ProductController
       return new ResponseEntity<>(product, HttpStatus.OK);
    }
 
-   @GetMapping("/findAll")
+   @GetMapping("/")
    public @ResponseBody
    ResponseEntity<List<Product>> findAllProducts()
    {

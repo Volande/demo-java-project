@@ -8,12 +8,13 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "image")
+@Table(name = "size")
 @Getter
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Images {
+public class Sizes {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
