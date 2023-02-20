@@ -25,11 +25,11 @@ public class Product {
     private String compound;
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "products_id")
     private List<Images> image;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "products_id")
     private List<Sizes> size;
 
     @ManyToMany( cascade = CascadeType.ALL)

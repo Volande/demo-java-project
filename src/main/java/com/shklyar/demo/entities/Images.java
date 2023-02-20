@@ -1,5 +1,6 @@
 package com.shklyar.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class Images {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+    @JsonIgnore
     @ManyToOne(optional = false)
     private Product products;
 

@@ -1,5 +1,6 @@
 package com.shklyar.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +20,9 @@ public class Sizes {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
+    @JsonIgnore
     @ManyToOne(optional = false)
     private Product products;
 
-    public Product getProducts() {
-        return products;
-    }
 
-    public void setProducts(Product products) {
-        this.products = products;
-    }
 }

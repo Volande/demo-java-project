@@ -50,7 +50,7 @@ public class ProductController
 
 
    @PostMapping("/save")
-   public ResponseEntity<Product> saveUser(Product product)
+   public ResponseEntity<Product> saveUser(@RequestBody Product product)
    {
       return new ResponseEntity<Product>(productService.saveProduct(product), HttpStatus.OK);
    }
