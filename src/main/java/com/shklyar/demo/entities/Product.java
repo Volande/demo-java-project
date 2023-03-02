@@ -41,4 +41,9 @@ public class Product {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "collection_id")
     private Collection collection;
+
+    public void addSizes(Sizes sizes){
+        size.add(sizes);
+
+    }
 }

@@ -2,6 +2,7 @@ package com.shklyar.demo.controller;
 
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.entities.Product;
+import com.shklyar.demo.entities.Sizes;
 import com.shklyar.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Controller
@@ -50,9 +52,12 @@ public class ProductController
 
 
    @PostMapping("/save")
-   public ResponseEntity<Product> saveUser(@RequestBody Product product)
+   public ResponseEntity<Product> saveUser(
+           @RequestPart("clothes") Product product)
    {
-      return new ResponseEntity<Product>(productService.saveProduct(product), HttpStatus.OK);
+      return new ResponseEntity<Product>(
+              productService.saveProduct(product),
+              HttpStatus.OK);
    }
 
 }

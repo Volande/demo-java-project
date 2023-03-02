@@ -3,9 +3,11 @@ package com.shklyar.demo.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shklyar.demo.dao.ProductRepository;
+import com.shklyar.demo.dao.SizeRepository;
 import com.shklyar.demo.entities.Category;
 import com.shklyar.demo.entities.Collection;
 import com.shklyar.demo.entities.Product;
+import com.shklyar.demo.entities.Sizes;
 import com.shklyar.demo.entities.Product_;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,6 +28,7 @@ public  class ProductService {
 
     public int minPrice;
     public int maxPrice;
+    SizeRepository sizeRepository;
 
     @Autowired
     public ProductService(ProductRepository productRepository){
@@ -36,8 +39,35 @@ public  class ProductService {
 
 
     public Product saveProduct(Product product) {
+
+        List<Sizes> sizes =new ArrayList<>(product.getSize());
+
+        for( Sizes size : sizes){
+            enrollSizestoProduct(product,size);
+        }
+
+        productRepository.save(product);
+
         return productRepository.save(product);
     }
+
+    public Sizes enrollSizestoProduct(Product product,Sizes sizes){
+
+        product.addSizes(sizes);
+        return sizeRepository.save(sizes);
+    }
+
+    /*public Product saveProductSizes(Product product,Sizes[] sizes){
+        saveProduct(product);
+
+        product.setSize((List<Sizes>) sizes);
+
+        return product;
+    }*/
+
+   /* public Sizes saveSizes(Sizes sizes){
+        return productRepository.save(sizes);
+    }*/
 
     public List<Product> findAllProducts() {
         return productRepository.findAll();
