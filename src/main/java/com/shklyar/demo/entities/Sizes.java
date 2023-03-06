@@ -24,7 +24,9 @@ public class Sizes {
     private String title;
 
 
-    public Sizes(String title){
+    public Sizes(
+            String title
+    ){
         this.title=title;
     }
 
