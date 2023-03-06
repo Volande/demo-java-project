@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "size")
@@ -20,9 +22,13 @@ public class Sizes {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String title;
-    @JsonIgnore
-    @ManyToOne(optional = false)
-    private Product products;
+
+
+    public Sizes(String title){
+        this.title=title;
+    }
+
+
 
 
 }

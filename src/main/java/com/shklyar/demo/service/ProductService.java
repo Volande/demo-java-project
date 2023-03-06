@@ -40,14 +40,6 @@ public  class ProductService {
 
     public Product saveProduct(Product product) {
 
-        List<Sizes> sizes =new ArrayList<>(product.getSize());
-
-        for( Sizes size : sizes){
-            enrollSizestoProduct(product,size);
-        }
-
-        productRepository.save(product);
-
         return productRepository.save(product);
     }
 

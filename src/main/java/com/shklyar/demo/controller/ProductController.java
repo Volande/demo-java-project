@@ -6,6 +6,7 @@ import com.shklyar.demo.entities.Sizes;
 import com.shklyar.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,7 @@ public class ProductController
    }
 
 
-   @PostMapping("/save")
+   @PostMapping(value ="/save" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
    public ResponseEntity<Product> saveUser(
            @RequestPart("clothes") Product product)
    {

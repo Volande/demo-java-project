@@ -28,8 +28,10 @@ public class Product {
     @JoinColumn(name = "products_id")
     private List<Images> image;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "products_id")
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable( name = "produts_size",
+            joinColumns = @JoinColumn( name = "products_id"),
+            inverseJoinColumns = @JoinColumn( name ="size_id" ))
     private List<Sizes> size;
 
     @ManyToMany( cascade = CascadeType.ALL)
@@ -45,5 +47,8 @@ public class Product {
     public void addSizes(Sizes sizes){
         size.add(sizes);
 
+
     }
+
+
 }

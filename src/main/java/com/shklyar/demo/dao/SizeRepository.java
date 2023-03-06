@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface SizeRepository extends JpaRepository<Sizes, Long>, JpaSpecificationExecutor<Sizes> {
 
+    public Sizes getByTitle(String title);
+
 }
