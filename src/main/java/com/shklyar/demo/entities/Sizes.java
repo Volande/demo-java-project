@@ -26,6 +26,7 @@ public class Sizes {
 
     public Sizes(
             String title
+
     ){
         this.title=title;
     }
