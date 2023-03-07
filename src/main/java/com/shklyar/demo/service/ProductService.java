@@ -36,9 +36,18 @@ public  class ProductService {
     }
 
     ProductRepository productRepository;
+    @Autowired
+    SizesService sizesService;
 
 
     public Product saveProduct(Product product) {
+
+     List<Sizes> size =  product.getSize();
+     for(Sizes i:size){
+         sizesService.initSize(i.getTitle() );
+     }
+
+
 
         return productRepository.save(product);
     }

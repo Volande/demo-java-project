@@ -9,4 +9,6 @@ public interface SizeRepository extends JpaRepository<Sizes, Long>, JpaSpecifica
 
     public Sizes getByTitle(String title);
 
+    public Sizes querySizesById(Long id);
+
 }

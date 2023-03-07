@@ -1,5 +1,6 @@
 package com.shklyar.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,9 +25,10 @@ public class Sizes {
     private String title;
 
 
+
+
     public Sizes(
             String title
-
     ){
         this.title=title;
     }
