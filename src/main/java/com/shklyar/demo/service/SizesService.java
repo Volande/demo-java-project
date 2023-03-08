@@ -29,14 +29,7 @@ public class SizesService {
             sizes = new Sizes();
             sizes.setTitle(string);
             sizeRepository.save(sizes);
-
-        } else {
-
-
-          //  Long l= sizes.getId();
-            //sizeRepository.querySizesById(l);
         }
-
 
         return sizes;
     }

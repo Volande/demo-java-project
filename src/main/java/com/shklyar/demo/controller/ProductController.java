@@ -17,48 +17,43 @@ import java.util.List;
 @Controller
 @RequestMapping("/products")
 @CrossOrigin(origins = "http://localhost:4200")
-public class ProductController
-{
-   ProductService productService;
-   ProductRepository productRepository;
+public class ProductController {
+    ProductService productService;
+    ProductRepository productRepository;
 
-   @Autowired
-   public ProductController(ProductService productService,ProductRepository productRepository)
-   {
-      this.productService = productService;
-      this.productRepository = productRepository;
-   }
+    @Autowired
+    public ProductController(ProductService productService, ProductRepository productRepository) {
+        this.productService = productService;
+        this.productRepository = productRepository;
+    }
 
 
-   @GetMapping(value = "/clothes/{id}")
-   public ResponseEntity<Product> findAllProducts(@PathVariable(name = "id") Long id)
-   {
-      Product product = productRepository.findProductById(id);
-      return new ResponseEntity<>(product, HttpStatus.OK);
-   }
+    @GetMapping(value = "/clothes/{id}")
+    public ResponseEntity<Product> findAllProducts(@PathVariable(name = "id") Long id) {
+        Product product = productRepository.findProductById(id);
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
 
-   @GetMapping("/")
-   public @ResponseBody
-   ResponseEntity<List<Product>> findAllProducts()
-   {
-      return new ResponseEntity<>(productService.findAllProducts(), HttpStatus.OK);
-   }
+    @GetMapping("/")
+    public @ResponseBody
+    ResponseEntity<List<Product>> findAllProducts() {
+        return new ResponseEntity<>(productService.findAllProducts(), HttpStatus.OK);
+    }
 
-   @GetMapping("/filter")
-   @ResponseBody
-   public ResponseEntity<List<Product>> findProduct(@RequestBody  String title){
-      List<Product> product = productService.findProduct(title);
-      return new ResponseEntity<>(product, HttpStatus.OK);
-   }
+    @GetMapping("/filter")
+    @ResponseBody
+    public ResponseEntity<List<Product>> findProduct(@RequestBody String title) {
+        List<Product> product = productService.findProduct(title);
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
 
 
-   @PostMapping(value ="/save" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-   public ResponseEntity<Product> saveUser(
-           @RequestPart("clothes") Product product)
-   {
-      return new ResponseEntity<Product>(
-              productService.saveProduct(product),
-              HttpStatus.OK);
-   }
+    @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Product> saveUser(
+            @RequestPart("clothes") Product product) {
+        return new ResponseEntity<Product>(
+                productService.saveProduct(product),
+                HttpStatus.OK);
+    }
 
 }

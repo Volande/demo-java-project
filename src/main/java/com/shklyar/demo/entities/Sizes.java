@@ -24,16 +24,16 @@ public class Sizes {
     private Long id;
     private String title;
 
-
+    @JsonBackReference
+    @ManyToMany(mappedBy = "size")
+    private Set<Product> products = new HashSet<>();
 
 
     public Sizes(
             String title
-    ){
-        this.title=title;
+    ) {
+        this.title = title;
     }
-
-
 
 
 }

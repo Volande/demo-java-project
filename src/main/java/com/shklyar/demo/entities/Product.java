@@ -3,6 +3,7 @@ package com.shklyar.demo.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,7 +17,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private  Long id;
+    private Long id;
     private String title;
     private Double price;
 
@@ -29,25 +30,25 @@ public class Product {
     private List<Images> image;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable( name = "produts_size",
-            joinColumns = @JoinColumn( name = "products_id"),
-            inverseJoinColumns = @JoinColumn( name ="size_id" ))
-    private List<Sizes> size;
+    @JoinTable(name = "produts_size",
+            joinColumns = @JoinColumn(name = "products_id"),
+            inverseJoinColumns = @JoinColumn(name = "size_id"))
+    private List<Sizes> size = new ArrayList<Sizes>();
 
-    @ManyToMany( cascade = CascadeType.ALL)
-    @JoinTable( name = "produts_categories",
-            joinColumns = @JoinColumn( name = "products_id"),
-            inverseJoinColumns = @JoinColumn( name ="category_id" ))
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "produts_categories",
+            joinColumns = @JoinColumn(name = "products_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "collection_id")
     private Collection collection;
 
-    public void addSizes(Sizes sizes){
+
+    public void addSizes(Sizes sizes) {
         size.add(sizes);
-
-
+        sizes.getProducts().add(this);
 
     }
 

@@ -15,15 +15,14 @@ import org.springframework.stereotype.Service;
 
 
 import javax.persistence.criteria.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
-
-
 @Service
-public  class ProductService {
+public class ProductService {
 
 
     public int minPrice;
@@ -31,7 +30,7 @@ public  class ProductService {
     SizeRepository sizeRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository){
+    public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
@@ -42,17 +41,14 @@ public  class ProductService {
 
     public Product saveProduct(Product product) {
 
-     List<Sizes> size =  product.getSize();
-     for(Sizes i:size){
-         sizesService.initSize(i.getTitle() );
-     }
-
-
+        for (int i = 0; i < product.getSize().size(); i++) {
+            product.getSize().set(i, sizesService.initSize(product.getSize().get(i).getTitle()));
+        }
 
         return productRepository.save(product);
     }
 
-    public Sizes enrollSizestoProduct(Product product,Sizes sizes){
+    public Sizes enrollSizestoProduct(Product product, Sizes sizes) {
 
         product.addSizes(sizes);
         return sizeRepository.save(sizes);
@@ -75,8 +71,6 @@ public  class ProductService {
     }
 
 
-
-
     public List<Product> findProduct(String productParamets) {
 
         try {
@@ -89,8 +83,7 @@ public  class ProductService {
     }
 
 
-    public Specification<Product> mapProduct(String string) throws JsonProcessingException
-    {
+    public Specification<Product> mapProduct(String string) throws JsonProcessingException {
 
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map;
@@ -103,17 +96,14 @@ public  class ProductService {
         return predicateForProducts(map);
     }
 
-    private Specification<Product> predicateForProducts(Map<String, Object> map)
-    {
+    private Specification<Product> predicateForProducts(Map<String, Object> map) {
 
-        return new Specification<Product>()
-        {
+        return new Specification<Product>() {
 
             @Override
             public Predicate toPredicate(Root<Product> root,
                                          CriteriaQuery<?> query,
-                                         CriteriaBuilder criteriaBuilder)
-            {
+                                         CriteriaBuilder criteriaBuilder) {
                 List<Predicate> productPredicateList = new ArrayList<>();
 
                 CriteriaQuery<Product> criteriaQuery = criteriaBuilder.createQuery(Product.class);
@@ -121,54 +111,41 @@ public  class ProductService {
                 criteriaQuery.select(category);
 
 
-                if (map.containsKey("minPrice") && map.containsKey(maxPrice))
-                {
+                if (map.containsKey("minPrice") && map.containsKey(maxPrice)) {
                     minPrice = (Integer) map.get("minPrice");
                     maxPrice = (Integer) map.get("maxPrice");
                     productPredicateList.add(criteriaBuilder.between(root.get("price"), new Double(minPrice), new Double(maxPrice)));
-                }
-                else if (map.containsKey("minPrice") && !map.containsKey("maxPrice"))
-                {
+                } else if (map.containsKey("minPrice") && !map.containsKey("maxPrice")) {
                     minPrice = (Integer) map.get("minPrice");
                     productPredicateList.add(criteriaBuilder.greaterThan(root.get("price"), minPrice));
-                }
-                else if (!map.containsKey("minPrice") && map.containsKey("maxPrice"))
-                {
+                } else if (!map.containsKey("minPrice") && map.containsKey("maxPrice")) {
                     maxPrice = (Integer) map.get("maxPrice");
                     productPredicateList.add(criteriaBuilder.lessThan(root.get("price"), maxPrice));
                 }
 
-                if (map.containsKey("onlyAvailable"))
-                {
+                if (map.containsKey("onlyAvailable")) {
                     productPredicateList.add(criteriaBuilder.isTrue(root.get("availability")));
                 }
 
-                if (map.containsKey("categories"))
-
-                {
+                if (map.containsKey("categories")) {
                     Join<Product, Category> predicateCategory = root.join("categories");
 
                     ArrayList<String> categories = (ArrayList<String>) map.get("categories");
 
-                    if (categories.size() > 0)
-                    {
+                    if (categories.size() > 0) {
                         productPredicateList.add(predicateCategory.get("title").in(categories));
                     }
                 }
 
-                if (map.containsKey("title"))
-                {
-                    productPredicateList.add(criteriaBuilder.equal(root.get("title"),map.get("title")));
+                if (map.containsKey("title")) {
+                    productPredicateList.add(criteriaBuilder.equal(root.get("title"), map.get("title")));
                 }
 
-                if (map.containsKey("size"))
-                {
-                    productPredicateList.add(criteriaBuilder.equal(root.get("size"),map.get("size")));
+                if (map.containsKey("size")) {
+                    productPredicateList.add(criteriaBuilder.equal(root.get("size"), map.get("size")));
                 }
 
-                if (map.containsKey("collection"))
-
-                {
+                if (map.containsKey("collection")) {
                     Join<Product, Collection> predicateCollection = root.join("collection");
 
                     String collection = (String) map.get("collection");
@@ -176,7 +153,6 @@ public  class ProductService {
                     productPredicateList.add(predicateCollection.get("title").in(collection));
 
                 }
-
 
 
                 return criteriaBuilder.and(productPredicateList.toArray(new Predicate[0]));
