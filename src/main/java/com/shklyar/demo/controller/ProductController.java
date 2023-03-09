@@ -1,6 +1,8 @@
 package com.shklyar.demo.controller;
 
+import com.shklyar.demo.dao.CategoryRepository;
 import com.shklyar.demo.dao.ProductRepository;
+import com.shklyar.demo.entities.Category;
 import com.shklyar.demo.entities.Product;
 import com.shklyar.demo.entities.Sizes;
 import com.shklyar.demo.service.ProductService;
@@ -20,11 +22,13 @@ import java.util.List;
 public class ProductController {
     ProductService productService;
     ProductRepository productRepository;
+    CategoryRepository categoryRepository;
 
     @Autowired
-    public ProductController(ProductService productService, ProductRepository productRepository) {
+    public ProductController(ProductService productService, ProductRepository productRepository,CategoryRepository categoryRepository) {
         this.productService = productService;
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
 
@@ -39,6 +43,13 @@ public class ProductController {
     ResponseEntity<List<Product>> findAllProducts() {
         return new ResponseEntity<>(productService.findAllProducts(), HttpStatus.OK);
     }
+
+    @GetMapping("/categories")
+    public @ResponseBody
+    ResponseEntity<List<Category>> findAllCategory() {
+        return new ResponseEntity<>(categoryRepository.findAll(), HttpStatus.OK);
+    }
+
 
     @GetMapping("/filter")
     @ResponseBody

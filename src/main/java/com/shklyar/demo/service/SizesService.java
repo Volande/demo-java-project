@@ -12,12 +12,11 @@ public class SizesService {
     @Autowired
     SizeRepository sizeRepository;
 
-    ProductService productService;
+
 
     @Autowired
     public SizesService(SizeRepository sizeRepository) {
         this.sizeRepository = sizeRepository;
-
     }
 
     public Sizes initSize(String string) {

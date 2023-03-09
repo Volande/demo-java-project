@@ -28,7 +28,6 @@ public class Sizes {
     @ManyToMany(mappedBy = "size")
     private Set<Product> products = new HashSet<>();
 
-
     public Sizes(
             String title
     ) {

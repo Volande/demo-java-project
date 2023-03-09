@@ -39,7 +39,7 @@ public class Product {
     @JoinTable(name = "produts_categories",
             joinColumns = @JoinColumn(name = "products_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<Category> categories;
+    private List<Category> categories = new ArrayList<Category>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "collection_id")

@@ -2,6 +2,7 @@ package com.shklyar.demo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shklyar.demo.dao.CategoryRepository;
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.dao.SizeRepository;
 import com.shklyar.demo.entities.Category;
@@ -28,6 +29,7 @@ public class ProductService {
     public int minPrice;
     public int maxPrice;
     SizeRepository sizeRepository;
+    CategoryRepository categoryRepository;
 
     @Autowired
     public ProductService(ProductRepository productRepository) {
@@ -35,8 +37,11 @@ public class ProductService {
     }
 
     ProductRepository productRepository;
+
     @Autowired
     SizesService sizesService;
+    @Autowired
+    CategoryService categoryService;
 
 
     public Product saveProduct(Product product) {
@@ -44,6 +49,11 @@ public class ProductService {
         for (int i = 0; i < product.getSize().size(); i++) {
             product.getSize().set(i, sizesService.initSize(product.getSize().get(i).getTitle()));
         }
+
+       for (int i = 0; i < product.getCategories().size(); i++) {
+           product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
+      }
+
 
         return productRepository.save(product);
     }
