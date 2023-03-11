@@ -42,17 +42,23 @@ public class ProductService {
     SizesService sizesService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    CollectionService collectionService;
 
 
     public Product saveProduct(Product product) {
+
+        for (int i = 0; i < product.getCategories().size(); i++) {
+            product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
+        }
 
         for (int i = 0; i < product.getSize().size(); i++) {
             product.getSize().set(i, sizesService.initSize(product.getSize().get(i).getTitle()));
         }
 
-       for (int i = 0; i < product.getCategories().size(); i++) {
-           product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
-      }
+
+        product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
+
 
 
         return productRepository.save(product);
