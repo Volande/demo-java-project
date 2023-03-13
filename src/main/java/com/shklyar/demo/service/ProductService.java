@@ -48,7 +48,7 @@ public class ProductService {
 
     public Product saveProduct(Product product) {
 
-        for (int i = 0; i < product.getCategories().size(); i++) {
+      /*  for (int i = 0; i < product.getCategories().size(); i++) {
             product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
         }
 
@@ -59,8 +59,7 @@ public class ProductService {
 
         product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
-
-
+       */
         return productRepository.save(product);
     }
 
