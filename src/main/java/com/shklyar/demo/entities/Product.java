@@ -3,6 +3,7 @@ package com.shklyar.demo.entities;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class Product {
     @JoinColumn(name = "products_id")
     private List<Images> image;
 
+    @Size(max = 255)
+    private String images;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "produts_size",
             joinColumns = @JoinColumn(name = "products_id"),
@@ -41,7 +45,7 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories = new ArrayList<Category>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
     @JoinColumn(name = "collection_id")
     private Collection collection;
 

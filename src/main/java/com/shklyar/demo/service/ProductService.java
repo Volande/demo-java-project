@@ -9,23 +9,37 @@ import com.shklyar.demo.entities.Category;
 import com.shklyar.demo.entities.Collection;
 import com.shklyar.demo.entities.Product;
 import com.shklyar.demo.entities.Sizes;
-import com.shklyar.demo.entities.Product_;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.persistence.criteria.*;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 
+
+
 @Service
 public class ProductService {
 
+    @Value("${imageCloudDirectory}")
+    private String directory;
 
+    @Value("${image.service.repository}")
+    String imagesDirectory;
+
+
+    @Value("${CloudFrontUrl}")
+    private String cloudFrontUrl;
+
+
+    String urlDelimiter = "/";
     public int minPrice;
     public int maxPrice;
     SizeRepository sizeRepository;
@@ -45,10 +59,12 @@ public class ProductService {
     @Autowired
     CollectionService collectionService;
 
+    ImageService imageService;
+
 
     public Product saveProduct(Product product) {
 
-      /*  for (int i = 0; i < product.getCategories().size(); i++) {
+       for (int i = 0; i < product.getCategories().size(); i++) {
             product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
         }
 
@@ -59,8 +75,27 @@ public class ProductService {
 
         product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
-       */
+
         return productRepository.save(product);
+    }
+
+    public boolean saveProductAndEnrollImage(Product product, MultipartFile multipartFile){
+
+        saveProduct(product);
+
+        String fileExtension =
+                multipartFile.getOriginalFilename().
+                        substring(multipartFile.getOriginalFilename().lastIndexOf("."));
+
+        String fileName = product.getId().toString() + "-" + RandomString.make(10) + fileExtension;
+
+        product.setImages(cloudFrontUrl + urlDelimiter + directory + fileName);
+
+        imageService.saveImage(fileName, multipartFile, fileExtension);
+
+        saveProduct(product);
+
+        return true;
     }
 
     public Sizes enrollSizestoProduct(Product product, Sizes sizes) {

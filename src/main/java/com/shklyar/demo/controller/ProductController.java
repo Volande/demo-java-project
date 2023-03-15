@@ -4,10 +4,7 @@ import com.shklyar.demo.dao.CategoryRepository;
 import com.shklyar.demo.dao.CollectionRepository;
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.dao.SizesRepository;
-import com.shklyar.demo.entities.Category;
-import com.shklyar.demo.entities.Collection;
-import com.shklyar.demo.entities.Product;
-import com.shklyar.demo.entities.Sizes;
+import com.shklyar.demo.entities.*;
 import com.shklyar.demo.service.CategoryService;
 import com.shklyar.demo.service.CollectionService;
 import com.shklyar.demo.service.ProductService;
@@ -18,8 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Size;
 import java.util.List;
 
 @Controller
@@ -118,10 +115,14 @@ public class ProductController {
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> saveProduct(
-            @RequestPart("clothes") Product product) {
-        return new ResponseEntity<Product>(
-                productService.saveProduct(product),
-                HttpStatus.OK);
+            @RequestPart("clothes") Product product,
+            @RequestPart(value = "image")MultipartFile multipartFile) {
+
+
+        productService.saveProductAndEnrollImage(product,multipartFile);
+
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
