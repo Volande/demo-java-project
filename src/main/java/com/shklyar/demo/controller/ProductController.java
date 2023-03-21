@@ -116,7 +116,7 @@ public class ProductController {
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> saveProduct(
             @RequestPart("clothes") Product product,
-            @RequestPart(value = "image")MultipartFile multipartFile) {
+            @RequestPart(value = "image")List<MultipartFile>   multipartFile) {
 
 
         productService.saveProductAndEnrollImage(product,multipartFile);

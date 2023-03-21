@@ -20,7 +20,7 @@ public class Images {
     private Long id;
     private String title;
     @JsonIgnore
-    @ManyToOne(optional = false)
+    @ManyToOne()
     private Product products;
 
     public Product getProducts() {

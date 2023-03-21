@@ -7,6 +7,11 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.shklyar.demo.dao.ImageRepository;
+import com.shklyar.demo.entities.Collection;
+import com.shklyar.demo.entities.Images;
+import com.shklyar.demo.entities.Product;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +21,14 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
-@Service
+@Service("ImageService")
 public class ImageService {
+    @Autowired
+    public ImageService(ImageRepository imageRepository) {
+        this.imageRepository = imageRepository;
+    }
 
     @Value("${image.service.repository}")
     String imagesDirectory;
@@ -36,6 +46,8 @@ public class ImageService {
     @Value("${imageCloudDirectory}")
     private String directory;
 
+    ImageRepository imageRepository;
+
     @PostConstruct
     private void initializeAmazon() {
         AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
@@ -49,6 +61,8 @@ public class ImageService {
     }
 
     public void saveImage(String fileName, MultipartFile multipartFile, String fileExtension) {
+
+
         try {
             if (multipartFile == null) {
                 throw new IllegalArgumentException();
@@ -70,5 +84,16 @@ public class ImageService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Images addImageToDatabase(String urlImage, Product product) {
+
+        Images images = new Images();
+        images.setTitle(urlImage);
+        images.setProducts(product);
+        imageRepository.save(images);
+
+
+        return images;
     }
 }

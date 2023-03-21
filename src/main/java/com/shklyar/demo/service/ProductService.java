@@ -3,12 +3,10 @@ package com.shklyar.demo.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shklyar.demo.dao.CategoryRepository;
+import com.shklyar.demo.dao.ImageRepository;
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.dao.SizeRepository;
-import com.shklyar.demo.entities.Category;
-import com.shklyar.demo.entities.Collection;
-import com.shklyar.demo.entities.Product;
-import com.shklyar.demo.entities.Sizes;
+import com.shklyar.demo.entities.*;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 
-
-
 @Service
 public class ProductService {
+    @Autowired
+    public ProductService(ProductRepository productRepository, ImageService imageService) {
+        this.productRepository = productRepository;
+        this.imageService = imageService;
+    }
 
     @Value("${imageCloudDirectory}")
     private String directory;
@@ -44,13 +45,9 @@ public class ProductService {
     public int maxPrice;
     SizeRepository sizeRepository;
     CategoryRepository categoryRepository;
-
-    @Autowired
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
     ProductRepository productRepository;
+
+    ImageRepository imageRepository;
 
     @Autowired
     SizesService sizesService;
@@ -64,7 +61,7 @@ public class ProductService {
 
     public Product saveProduct(Product product) {
 
-       for (int i = 0; i < product.getCategories().size(); i++) {
+        for (int i = 0; i < product.getCategories().size(); i++) {
             product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
         }
 
@@ -79,20 +76,24 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public boolean saveProductAndEnrollImage(Product product, MultipartFile multipartFile){
-
+    public boolean saveProductAndEnrollImage(Product product, List<MultipartFile> multipartFile) {
+        List<Images> list = new ArrayList<>();
         saveProduct(product);
+        for (int i = 0; i < multipartFile.size(); i++) {
+            String fileExtension = multipartFile.get(i).getOriginalFilename().substring(multipartFile.get(i).getOriginalFilename().lastIndexOf("."));
 
-        String fileExtension =
-                multipartFile.getOriginalFilename().
-                        substring(multipartFile.getOriginalFilename().lastIndexOf("."));
+            String fileName = product.getId().toString() + "-" + RandomString.make(10) + fileExtension;
 
-        String fileName = product.getId().toString() + "-" + RandomString.make(10) + fileExtension;
+            Images image = imageService.addImageToDatabase(cloudFrontUrl + urlDelimiter + directory + fileName, product);
 
-        product.setImages(cloudFrontUrl + urlDelimiter + directory + fileName);
 
-        imageService.saveImage(fileName, multipartFile, fileExtension);
+            list.add(image);
 
+            imageService.saveImage(fileName, multipartFile.get(i), fileExtension);
+
+        }
+
+        product.setImage(list);
         saveProduct(product);
 
         return true;
@@ -151,9 +152,7 @@ public class ProductService {
         return new Specification<Product>() {
 
             @Override
-            public Predicate toPredicate(Root<Product> root,
-                                         CriteriaQuery<?> query,
-                                         CriteriaBuilder criteriaBuilder) {
+            public Predicate toPredicate(Root<Product> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 List<Predicate> productPredicateList = new ArrayList<>();
 
                 CriteriaQuery<Product> criteriaQuery = criteriaBuilder.createQuery(Product.class);

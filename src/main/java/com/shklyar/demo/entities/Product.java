@@ -26,7 +26,7 @@ public class Product {
     private String content;
     private String compound;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
     @JoinColumn(name = "products_id")
     private List<Images> image;
 
