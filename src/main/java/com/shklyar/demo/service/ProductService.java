@@ -72,6 +72,12 @@ public class ProductService {
 
         product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
+        if(product.getImage() != null){
+            for (int i = 0; i < product.getImage().size(); i++) {
+                product.getImage().set(i, imageService.initImages(product.getImage().get(i).getTitle()));
+            }
+        }
+
 
         return productRepository.save(product);
     }
@@ -79,22 +85,32 @@ public class ProductService {
     public boolean saveProductAndEnrollImage(Product product, List<MultipartFile> multipartFile) {
         List<Images> list = new ArrayList<>();
         saveProduct(product);
-        for (int i = 0; i < multipartFile.size(); i++) {
-            String fileExtension = multipartFile.get(i).getOriginalFilename().substring(multipartFile.get(i).getOriginalFilename().lastIndexOf("."));
 
-            String fileName = product.getId().toString() + "-" + RandomString.make(10) + fileExtension;
+        if(multipartFile != null){
+            for (int i = 0; i < multipartFile.size(); i++) {
+                String fileExtension = multipartFile.get(i).getOriginalFilename().substring(multipartFile.get(i).getOriginalFilename().lastIndexOf("."));
 
-            Images image = imageService.addImageToDatabase(cloudFrontUrl + urlDelimiter + directory + fileName, product);
+                String fileName = product.getId().toString() + "-" + RandomString.make(10) + fileExtension;
+
+                Images image = imageService.addImageToDatabase(cloudFrontUrl + urlDelimiter + directory + fileName, product);
 
 
-            list.add(image);
+                list.add(image);
 
-            imageService.saveImage(fileName, multipartFile.get(i), fileExtension);
+                imageService.saveImage(fileName, multipartFile.get(i), fileExtension);
 
+            }
+
+            if(product.getImage() != null){
+                for (int i = 0; i < product.getImage().size(); i++) {
+                    list.add(product.getImage().get(i));
+                }
+            }
+            product.setImage(list);
+            saveProduct(product);
         }
 
-        product.setImage(list);
-        saveProduct(product);
+
 
         return true;
     }

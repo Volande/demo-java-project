@@ -96,4 +96,18 @@ public class ImageService {
 
         return images;
     }
+
+    public Images initImages(String urlImage) {
+
+
+        Images newImage = imageRepository.getByTitle(urlImage);
+
+        if (newImage == null) {
+            newImage = new Images();
+            newImage.setTitle(urlImage);
+            imageRepository.save(newImage);
+        }
+
+        return newImage;
+    }
 }
