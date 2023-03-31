@@ -16,12 +16,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.persistence.criteria.*;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 
 @Service
+@Transactional
 public class ProductService {
     @Autowired
     public ProductService(ProductRepository productRepository, ImageService imageService) {
@@ -46,7 +49,7 @@ public class ProductService {
     SizeRepository sizeRepository;
     CategoryRepository categoryRepository;
     ProductRepository productRepository;
-
+    @Autowired
     ImageRepository imageRepository;
 
     @Autowired
@@ -72,7 +75,7 @@ public class ProductService {
 
         product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
-        if(product.getImage() != null){
+        if (product.getImage() != null) {
             for (int i = 0; i < product.getImage().size(); i++) {
                 product.getImage().set(i, imageService.initImages(product.getImage().get(i).getTitle()));
             }
@@ -82,11 +85,62 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    public List<Images> changeOrderImages(List<Images> images, Product product) {
+
+
+        List<Images> list2 = imageRepository.findImagesByProducts(product);
+
+
+
+
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < images.size(); i++) {
+            strings.add(images.get(i).getTitle());
+        }
+
+
+        for (Images images2 : list2) {
+            if (!strings.contains(images2.getTitle())) {
+                imageRepository.removeImagesById(imageRepository.findImagesById(images2.getId()).getId());
+
+            }
+        }
+
+
+        List<Long> list = new ArrayList<>();
+        for (int i = 0; i < images.size(); i++) {
+            list.add(images.get(i).getId());
+        }
+
+        Long[] list1 = list.toArray(new Long[0]);
+        Arrays.sort(list1);
+
+        list = List.of(list1);
+
+        for (int i = 0; i < images.size(); i++) {
+            images.get(i).setId(list.get(i));
+            images.get(i).setProducts(product);
+        }
+
+
+        imageRepository.saveAll(images);
+
+
+        return images;
+    }
+
     public boolean saveProductAndEnrollImage(Product product, List<MultipartFile> multipartFile) {
         List<Images> list = new ArrayList<>();
+
+
+        List<Images> list1 = changeOrderImages(product.getImage(), product);
+        product.setImage(list1);
+
+        List<Images> list2 = imageRepository.findImagesByProducts(product);
+
         saveProduct(product);
 
-        if(multipartFile != null){
+        if (multipartFile != null) {
             for (int i = 0; i < multipartFile.size(); i++) {
                 String fileExtension = multipartFile.get(i).getOriginalFilename().substring(multipartFile.get(i).getOriginalFilename().lastIndexOf("."));
 
@@ -101,7 +155,7 @@ public class ProductService {
 
             }
 
-            if(product.getImage() != null){
+            if (product.getImage() != null) {
                 for (int i = 0; i < product.getImage().size(); i++) {
                     list.add(product.getImage().get(i));
                 }
@@ -109,7 +163,6 @@ public class ProductService {
             product.setImage(list);
             saveProduct(product);
         }
-
 
 
         return true;

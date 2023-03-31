@@ -8,6 +8,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.shklyar.demo.dao.ImageRepository;
+import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.entities.Collection;
 import com.shklyar.demo.entities.Images;
 import com.shklyar.demo.entities.Product;
@@ -26,8 +27,9 @@ import java.util.List;
 @Service("ImageService")
 public class ImageService {
     @Autowired
-    public ImageService(ImageRepository imageRepository) {
+    public ImageService(ImageRepository imageRepository, ProductRepository productRepository) {
         this.imageRepository = imageRepository;
+        this.productRepository=productRepository;
     }
 
     @Value("${image.service.repository}")
@@ -47,6 +49,7 @@ public class ImageService {
     private String directory;
 
     ImageRepository imageRepository;
+    ProductRepository productRepository;
 
     @PostConstruct
     private void initializeAmazon() {
@@ -94,8 +97,11 @@ public class ImageService {
         imageRepository.save(images);
 
 
+
         return images;
     }
+
+
 
     public Images initImages(String urlImage) {
 
@@ -106,6 +112,7 @@ public class ImageService {
             newImage = new Images();
             newImage.setTitle(urlImage);
             imageRepository.save(newImage);
+
         }
 
         return newImage;
