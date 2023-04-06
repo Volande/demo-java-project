@@ -27,11 +27,10 @@ public class Product {
     private String compound;
 
     @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    @OrderBy("id ASC")
     @JoinColumn(name = "products_id")
     private List<Images> image;
 
-    @Size(max = 255)
-    private String images;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "produts_size",
@@ -53,6 +52,12 @@ public class Product {
     public void addSizes(Sizes sizes) {
         size.add(sizes);
         sizes.getProducts().add(this);
+
+    }
+
+    public void removeImage(Images image){
+        this.image.remove(image);
+        image.setProducts(null);
 
     }
 

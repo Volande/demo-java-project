@@ -21,7 +21,7 @@ public class CategoryService {
     public Category initCategory(String category) {
 
 
-        Category categories = categoryRepository.getByTitle(category);
+        Category categories = categoryRepository.getCategoryByTitle(category);
 
         if (categories == null) {
             categories = new Category();

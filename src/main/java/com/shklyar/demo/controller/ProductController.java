@@ -125,4 +125,16 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Product> deleteCar(@PathVariable long productId) {
+        ResponseEntity<Product> response = ResponseEntity.badRequest().body(null);
+
+        Product product = productRepository.findProductById(productId);
+
+        if (product != null) {
+            response = productService.deleteProduct(productId);
+        }
+
+        return response;
+    }
 }

@@ -7,29 +7,35 @@ import com.shklyar.demo.dao.ImageRepository;
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.dao.SizeRepository;
 import com.shklyar.demo.entities.*;
+import com.shklyar.demo.entities.Collection;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Service
 @Transactional
 public class ProductService {
     @Autowired
-    public ProductService(ProductRepository productRepository, ImageService imageService) {
+    public ProductService(ProductRepository productRepository,
+                          ImageService imageService,
+                          CollectionService collectionService,
+                          SizesService sizesService,
+                          CategoryService categoryService) {
         this.productRepository = productRepository;
         this.imageService = imageService;
+        this.collectionService = collectionService;
+        this.sizesService=sizesService;
+        this.categoryService=categoryService;
     }
 
     @Value("${imageCloudDirectory}")
@@ -49,14 +55,14 @@ public class ProductService {
     SizeRepository sizeRepository;
     CategoryRepository categoryRepository;
     ProductRepository productRepository;
-    @Autowired
+
     ImageRepository imageRepository;
 
-    @Autowired
+
     SizesService sizesService;
-    @Autowired
+
     CategoryService categoryService;
-    @Autowired
+
     CollectionService collectionService;
 
     ImageService imageService;
@@ -68,12 +74,13 @@ public class ProductService {
             product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
         }
 
+        product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
+
         for (int i = 0; i < product.getSize().size(); i++) {
             product.getSize().set(i, sizesService.initSize(product.getSize().get(i).getTitle()));
         }
 
 
-        product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
         if (product.getImage() != null) {
             for (int i = 0; i < product.getImage().size(); i++) {
@@ -85,14 +92,45 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public List<Images> changeOrderImages(List<Images> images, Product product) {
+    public boolean changeOrderImages( Product product) {
 
+        List<Long> listId = new ArrayList<>();
+        List<String> listTitle = new ArrayList<>();
+        for (int i = 0; i < product.getImage().size(); i++) {
+            listId.add(product.getImage().get(i).getId());
+            listTitle.add(product.getImage().get(i).getTitle());
+        }
+
+        Collections.sort(listId);
+
+        product.setImage(new ArrayList<>());
+
+        for (int i = 0; i < listId.size(); i++) {
+            product.getImage().add(new Images(listId.get(i),listTitle.get(i),product));
+        }
+        productRepository.save(product);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*  productRepository.save(product);
 
         List<Images> list2 = imageRepository.findImagesByProducts(product);
 
 
 
 
+        List<Images> images = productRepository.findProductById(product.getId()).getImage();
         List<String> strings = new ArrayList<>();
         for (int i = 0; i < images.size(); i++) {
             strings.add(images.get(i).getTitle());
@@ -101,8 +139,8 @@ public class ProductService {
 
         for (Images images2 : list2) {
             if (!strings.contains(images2.getTitle())) {
-                imageRepository.removeImagesById(imageRepository.findImagesById(images2.getId()).getId());
 
+                productRepository.findProductById(product.getId()).getImage().remove(images2);
             }
         }
 
@@ -123,20 +161,33 @@ public class ProductService {
         }
 
 
-        imageRepository.saveAll(images);
+        imageRepository.saveAll(images);*/
 
 
-        return images;
+        return true;
     }
 
     public boolean saveProductAndEnrollImage(Product product, List<MultipartFile> multipartFile) {
+
         List<Images> list = new ArrayList<>();
+        List<Category> categoryList = product.getCategories();
+        List<Sizes> sizesList = product.getSize();
+        Collection collection = product.getCollection();
+
+        product.setCollection(null);
+        product.setSize(new ArrayList<>());
+        product.setCategories(new ArrayList<>());
+
+        if(product.getImage() != null){
+            changeOrderImages(product);
+        }
+
+        product.setCategories(categoryList);
+        product.setCollection(collection);
+        product.setSize(sizesList);
 
 
-        List<Images> list1 = changeOrderImages(product.getImage(), product);
-        product.setImage(list1);
 
-        List<Images> list2 = imageRepository.findImagesByProducts(product);
 
         saveProduct(product);
 
@@ -281,5 +332,18 @@ public class ProductService {
 
     }
 
+    public ResponseEntity<Product> deleteProduct(long productId) {
+        Product product = productRepository.findProductById(productId);
+
+
+        for (int i=0;i<product.getImage().size(); i++){
+            imageService.deleteImage(product.getImage().get(i).getTitle());
+        }
+
+        productRepository.deleteById(productId);
+
+
+        return ResponseEntity.ok(product);
+    }
 
 }

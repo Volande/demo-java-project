@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -96,8 +97,6 @@ public class ImageService {
         images.setProducts(product);
         imageRepository.save(images);
 
-
-
         return images;
     }
 
@@ -105,16 +104,26 @@ public class ImageService {
 
     public Images initImages(String urlImage) {
 
-
         Images newImage = imageRepository.getByTitle(urlImage);
 
         if (newImage == null) {
             newImage = new Images();
             newImage.setTitle(urlImage);
             imageRepository.save(newImage);
-
         }
 
         return newImage;
+    }
+
+    public boolean deleteImage(String imageURL) {
+        if (imageURL == null) {
+            return true;
+        }
+
+        imageURL = imageURL.substring(imageURL.lastIndexOf("/") + 1);
+
+        s3client.deleteObject(bucketName, directory + imageURL);
+
+        return true;
     }
 }
