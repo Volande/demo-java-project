@@ -14,16 +14,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import javax.persistence.criteria.*;
-import javax.transaction.Transactional;
 import java.util.*;
 
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 public class ProductService {
     @Autowired
     public ProductService(ProductRepository productRepository,
@@ -96,6 +97,8 @@ public class ProductService {
 
         List<Long> listId = new ArrayList<>();
         List<String> listTitle = new ArrayList<>();
+
+
         for (int i = 0; i < product.getImage().size(); i++) {
             listId.add(product.getImage().get(i).getId());
             listTitle.add(product.getImage().get(i).getTitle());
@@ -110,6 +113,7 @@ public class ProductService {
         }
         productRepository.save(product);
 
+        imageService.deleteUnusedImages();
 
 
 
@@ -332,7 +336,7 @@ public class ProductService {
 
     }
 
-    public ResponseEntity<Product> deleteProduct(long productId) {
+    public ResponseEntity<Long> deleteProduct(long productId) {
         Product product = productRepository.findProductById(productId);
 
 
@@ -343,7 +347,7 @@ public class ProductService {
         productRepository.deleteById(productId);
 
 
-        return ResponseEntity.ok(product);
+        return ResponseEntity.ok(product.getId());
     }
 
 }

@@ -32,19 +32,45 @@ public class Product {
     private List<Images> image;
 
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade =
+                    {
+                            CascadeType.DETACH,
+                            CascadeType.MERGE,
+                            CascadeType.REFRESH,
+                            CascadeType.PERSIST
+                    },
+            targetEntity = Sizes.class)
     @JoinTable(name = "produts_size",
             joinColumns = @JoinColumn(name = "products_id"),
             inverseJoinColumns = @JoinColumn(name = "size_id"))
     private List<Sizes> size = new ArrayList<Sizes>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade =
+                    {
+                            CascadeType.DETACH,
+                            CascadeType.MERGE,
+                            CascadeType.REFRESH,
+                            CascadeType.PERSIST
+                    },
+            targetEntity = Category.class)
     @JoinTable(name = "produts_categories",
             joinColumns = @JoinColumn(name = "products_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private List<Category> categories = new ArrayList<Category>();
 
-    @ManyToOne(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+
+    @ManyToOne(fetch = FetchType.EAGER,
+            cascade =
+                    {
+                            CascadeType.DETACH,
+                            CascadeType.MERGE,
+                            CascadeType.REFRESH,
+                            CascadeType.PERSIST
+                    },
+            targetEntity = Collection.class)
     @JoinColumn(name = "collection_id")
     private Collection collection;
 

@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -125,9 +127,9 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Product> deleteCar(@PathVariable long productId) {
-        ResponseEntity<Product> response = ResponseEntity.badRequest().body(null);
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<Long> deleteProduct(@PathVariable long productId) {
+        ResponseEntity<Long> response = ResponseEntity.badRequest().body(null);
 
         Product product = productRepository.findProductById(productId);
 

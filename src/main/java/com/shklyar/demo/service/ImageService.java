@@ -126,4 +126,13 @@ public class ImageService {
 
         return true;
     }
+
+    public void deleteUnusedImages(){
+       List<Images> imagesList =  imageRepository.findImagesByProducts(null);
+       for(Images image:imagesList){
+           if(deleteImage(image.getTitle())) {
+               imageRepository.delete(image);
+           }
+       }
+    }
 }
