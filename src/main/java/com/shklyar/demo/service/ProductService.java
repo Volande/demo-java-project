@@ -82,7 +82,6 @@ public class ProductService {
         }
 
 
-
         if (product.getImage() != null) {
             for (int i = 0; i < product.getImage().size(); i++) {
                 product.getImage().set(i, imageService.initImages(product.getImage().get(i).getTitle()));
