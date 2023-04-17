@@ -264,8 +264,6 @@ public class ProductService {
 
         map = mapper.readValue(string, Map.class);
 
-        ObjectMapper mapperCategories = new ObjectMapper();
-        Map<String, String> mapCategories;
 
         return predicateForProducts(map);
     }

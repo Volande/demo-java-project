@@ -27,6 +27,7 @@ import java.util.List;
 public class ProductController {
     ProductService productService;
 
+
     CollectionService collectionService;
     ProductRepository productRepository;
     CategoryRepository categoryRepository;
@@ -107,11 +108,11 @@ public class ProductController {
     }
 
 
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     @ResponseBody
     public ResponseEntity<List<Product>> findProduct(@RequestBody String title) {
         List<Product> product = productService.findProduct(title);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        return new ResponseEntity<List<Product>>(product, HttpStatus.OK);
     }
 
 
