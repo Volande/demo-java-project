@@ -35,8 +35,8 @@ public class ProductService {
         this.productRepository = productRepository;
         this.imageService = imageService;
         this.collectionService = collectionService;
-        this.sizesService=sizesService;
-        this.categoryService=categoryService;
+        this.sizesService = sizesService;
+        this.categoryService = categoryService;
     }
 
     @Value("${imageCloudDirectory}")
@@ -51,8 +51,11 @@ public class ProductService {
 
 
     String urlDelimiter = "/";
-    public int minPrice;
-    public int maxPrice;
+    public double minPrice;
+    public double maxPrice;
+    public boolean availability;
+
+    public ArrayList<Object> arrayList = new ArrayList<>();
     SizeRepository sizeRepository;
     CategoryRepository categoryRepository;
     ProductRepository productRepository;
@@ -92,7 +95,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public boolean changeOrderImages( Product product) {
+    public boolean changeOrderImages(Product product) {
 
         List<Long> listId = new ArrayList<>();
         List<String> listTitle = new ArrayList<>();
@@ -108,64 +111,11 @@ public class ProductService {
         product.setImage(new ArrayList<>());
 
         for (int i = 0; i < listId.size(); i++) {
-            product.getImage().add(new Images(listId.get(i),listTitle.get(i),product));
+            product.getImage().add(new Images(listId.get(i), listTitle.get(i), product));
         }
         productRepository.save(product);
 
         imageService.deleteUnusedImages();
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*  productRepository.save(product);
-
-        List<Images> list2 = imageRepository.findImagesByProducts(product);
-
-
-
-
-        List<Images> images = productRepository.findProductById(product.getId()).getImage();
-        List<String> strings = new ArrayList<>();
-        for (int i = 0; i < images.size(); i++) {
-            strings.add(images.get(i).getTitle());
-        }
-
-
-        for (Images images2 : list2) {
-            if (!strings.contains(images2.getTitle())) {
-
-                productRepository.findProductById(product.getId()).getImage().remove(images2);
-            }
-        }
-
-
-        List<Long> list = new ArrayList<>();
-        for (int i = 0; i < images.size(); i++) {
-            list.add(images.get(i).getId());
-        }
-
-        Long[] list1 = list.toArray(new Long[0]);
-        Arrays.sort(list1);
-
-        list = List.of(list1);
-
-        for (int i = 0; i < images.size(); i++) {
-            images.get(i).setId(list.get(i));
-            images.get(i).setProducts(product);
-        }
-
-
-        imageRepository.saveAll(images);*/
-
 
         return true;
     }
@@ -181,15 +131,13 @@ public class ProductService {
         product.setSize(new ArrayList<>());
         product.setCategories(new ArrayList<>());
 
-        if(product.getImage() != null){
+        if (product.getImage() != null) {
             changeOrderImages(product);
         }
 
         product.setCategories(categoryList);
         product.setCollection(collection);
         product.setSize(sizesList);
-
-
 
 
         saveProduct(product);
@@ -249,13 +197,34 @@ public class ProductService {
 
         try {
 
-            return productRepository.findAll(mapProduct(productParamets));
+            List<Product> productList = productRepository.findAll(mapProduct(productParamets));
+
+            productList = checkForDuplicates(productList);
+
+
+            return productList;
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
     }
 
+    private List<Product> checkForDuplicates(List<Product> array) {
+        Set<Product> set = new HashSet<Product>();
+
+        List<Product> productListNew = new ArrayList<>();
+        for (Product e : array) {
+            if (!(set.contains(e))) {
+                if (e != null) {
+                    set.add(e);
+                }
+            }
+
+        }
+        productListNew.addAll(set);
+
+        return productListNew;
+    }
 
     public Specification<Product> mapProduct(String string) throws JsonProcessingException {
 
@@ -281,26 +250,40 @@ public class ProductService {
                 criteriaQuery.select(category);
 
 
-                if (map.containsKey("minPrice") && map.containsKey(maxPrice)) {
-                    minPrice = (Integer) map.get("minPrice");
-                    maxPrice = (Integer) map.get("maxPrice");
-                    productPredicateList.add(criteriaBuilder.between(root.get("price"), new Double(minPrice), new Double(maxPrice)));
-                } else if (map.containsKey("minPrice") && !map.containsKey("maxPrice")) {
-                    minPrice = (Integer) map.get("minPrice");
-                    productPredicateList.add(criteriaBuilder.greaterThan(root.get("price"), minPrice));
-                } else if (!map.containsKey("minPrice") && map.containsKey("maxPrice")) {
-                    maxPrice = (Integer) map.get("maxPrice");
-                    productPredicateList.add(criteriaBuilder.lessThan(root.get("price"), maxPrice));
+                if (map.get("minPrice") != "" || map.get("maxPrice") != "") {
+                    if (map.containsKey("minPrice") && map.containsKey("maxPrice")) {
+                        if(map.get("minPrice") != "" ){
+                            minPrice = Double.parseDouble((String) map.get("minPrice"));
+                        };
+
+                        if(map.get("maxPrice") != ""){
+                            maxPrice = Double.parseDouble((String) map.get("maxPrice"));
+                        };
+                        productPredicateList.add(criteriaBuilder.between(root.get("price"), new Double(minPrice), new Double(maxPrice)));
+                    } else if (map.containsKey("minPrice") && !map.containsKey("maxPrice")) {
+                        minPrice = Double.parseDouble((String) map.get("minPrice"));
+                        productPredicateList.add(criteriaBuilder.greaterThan(root.get("price"), minPrice));
+                    } else if (!map.containsKey("minPrice") && map.containsKey("maxPrice")) {
+                        maxPrice = Double.parseDouble((String) map.get("maxPrice"));
+                        productPredicateList.add(criteriaBuilder.lessThan(root.get("price"), maxPrice));
+                    }
+
+
                 }
 
-                if (map.containsKey("onlyAvailable")) {
-                    productPredicateList.add(criteriaBuilder.isTrue(root.get("availability")));
+
+                if (map.get("availability") != "" && map.containsKey("availability")) {
+
+
+                    productPredicateList.add(criteriaBuilder.equal(root.get("availability"), map.get("availability")));
+
                 }
 
                 if (map.containsKey("categories")) {
                     Join<Product, Category> predicateCategory = root.join("categories");
 
                     ArrayList<String> categories = (ArrayList<String>) map.get("categories");
+
 
                     if (categories.size() > 0) {
                         productPredicateList.add(predicateCategory.get("title").in(categories));
@@ -312,15 +295,24 @@ public class ProductService {
                 }
 
                 if (map.containsKey("size")) {
-                    productPredicateList.add(criteriaBuilder.equal(root.get("size"), map.get("size")));
+
+                    Join<Product, Sizes> predicateSize = root.join("size");
+
+                    ArrayList<String> size = (ArrayList<String>) map.get("size");
+
+                    if (size.size() > 0) {
+                        productPredicateList.add(predicateSize.get("title").in(size));
+                    }
+
                 }
+
 
                 if (map.containsKey("collection")) {
                     Join<Product, Collection> predicateCollection = root.join("collection");
-
-                    String collection = (String) map.get("collection");
-
-                    productPredicateList.add(predicateCollection.get("title").in(collection));
+                    ArrayList<String> collections = (ArrayList<String>) map.get("collection");
+                    if (collections.size() > 0) {
+                        productPredicateList.add(predicateCollection.get("title").in(collections));
+                    }
 
                 }
 
@@ -337,7 +329,7 @@ public class ProductService {
         Product product = productRepository.findProductById(productId);
 
 
-        for (int i=0;i<product.getImage().size(); i++){
+        for (int i = 0; i < product.getImage().size(); i++) {
             imageService.deleteImage(product.getImage().get(i).getTitle());
         }
 

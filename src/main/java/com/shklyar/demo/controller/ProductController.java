@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/products")
@@ -52,11 +54,11 @@ public class ProductController {
         this.productService = productService;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-        this.collectionRepository=collectionRepository;
-        this.collectionService=collectionService;
-        this.sizesRepository=sizesRepository;
-        this.sizesService=sizesService;
-        this.categoryService=categoryService;
+        this.collectionRepository = collectionRepository;
+        this.collectionService = collectionService;
+        this.sizesRepository = sizesRepository;
+        this.sizesService = sizesService;
+        this.categoryService = categoryService;
     }
 
 
@@ -89,21 +91,22 @@ public class ProductController {
     ResponseEntity<List<Sizes>> findAllSizes() {
         return new ResponseEntity<>(sizesRepository.findAll(), HttpStatus.OK);
     }
-    @PostMapping( "/newCategory")
+
+    @PostMapping("/newCategory")
     public @ResponseBody
-    ResponseEntity<Category> saveNewCategory( Category category) {
+    ResponseEntity<Category> saveNewCategory(Category category) {
         return new ResponseEntity<>(categoryService.initCategory(category.getTitle()), HttpStatus.OK);
     }
 
     @PostMapping("/newCollection")
     public @ResponseBody
-    ResponseEntity<Collection> saveNewCollection( Collection collection) {
+    ResponseEntity<Collection> saveNewCollection(Collection collection) {
         return new ResponseEntity<>(collectionService.initCollection(collection.getTitle()), HttpStatus.OK);
     }
 
     @PostMapping("/newSize")
     public @ResponseBody
-    ResponseEntity<Sizes> saveNewSizes(Sizes string ) {
+    ResponseEntity<Sizes> saveNewSizes(Sizes string) {
         return new ResponseEntity<>(sizesService.initSize(string.getTitle()), HttpStatus.OK);
     }
 
@@ -112,17 +115,18 @@ public class ProductController {
     @ResponseBody
     public ResponseEntity<List<Product>> findProduct(@RequestBody String title) {
         List<Product> product = productService.findProduct(title);
-        return new ResponseEntity<List<Product>>(product, HttpStatus.OK);
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
+
 
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> saveProduct(
             @RequestPart("clothes") Product product,
-            @RequestPart(value = "image", required = false)List<MultipartFile>   multipartFile) {
+            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
 
 
-        productService.saveProductAndEnrollImage(product,multipartFile);
+        productService.saveProductAndEnrollImage(product, multipartFile);
 
 
         return new ResponseEntity<>(HttpStatus.OK);
