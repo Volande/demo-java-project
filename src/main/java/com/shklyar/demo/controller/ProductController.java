@@ -1,9 +1,6 @@
 package com.shklyar.demo.controller;
 
-import com.shklyar.demo.dao.CategoryRepository;
-import com.shklyar.demo.dao.CollectionRepository;
-import com.shklyar.demo.dao.ProductRepository;
-import com.shklyar.demo.dao.SizesRepository;
+import com.shklyar.demo.dao.*;
 import com.shklyar.demo.entities.*;
 import com.shklyar.demo.service.CategoryService;
 import com.shklyar.demo.service.CollectionService;
@@ -43,12 +40,14 @@ public class ProductController {
 
 
     @Autowired
-    public ProductController(ProductService productService,
+    public ProductController(
                              ProductRepository productRepository,
                              CategoryRepository categoryRepository,
                              CollectionRepository collectionRepository,
-                             CollectionService collectionService,
                              SizesRepository sizesRepository,
+
+                             ProductService productService,
+                             CollectionService collectionService,
                              SizesService sizesService,
                              CategoryService categoryService) {
         this.productService = productService;
@@ -144,4 +143,6 @@ public class ProductController {
 
         return response;
     }
+
+
 }

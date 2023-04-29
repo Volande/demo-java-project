@@ -170,24 +170,6 @@ public class ProductService {
         return true;
     }
 
-    public Sizes enrollSizestoProduct(Product product, Sizes sizes) {
-
-        product.addSizes(sizes);
-        return sizeRepository.save(sizes);
-    }
-
-    /*public Product saveProductSizes(Product product,Sizes[] sizes){
-        saveProduct(product);
-
-        product.setSize((List<Sizes>) sizes);
-
-        return product;
-    }*/
-
-   /* public Sizes saveSizes(Sizes sizes){
-        return productRepository.save(sizes);
-    }*/
-
     public List<Product> findAllProducts() {
         return productRepository.findAll();
     }

@@ -52,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
               .antMatchers(LOGIN_ENDPOINT).permitAll()
               .antMatchers("/product/**").permitAll()
               .antMatchers(ADMIN_ENDPOINT).hasAuthority("ADMIN")
+              .antMatchers("/api/v1/auth/orderAll").permitAll()
               .anyRequest().permitAll()
 
 

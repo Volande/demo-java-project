@@ -22,9 +22,10 @@ public class Product {
     private String title;
     private Double price;
 
-    private Boolean availability;
+    private String availability;
     private String content;
     private String compound;
+    private Double quantity = 1.0;
 
     @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
     @OrderBy("id ASC")

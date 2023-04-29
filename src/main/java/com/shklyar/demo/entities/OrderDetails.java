@@ -18,16 +18,16 @@ public class OrderDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     @ManyToOne
     @JoinColumn( name = "order_id")
     private Order order;
-
     @ManyToOne
     @JoinColumn( name = "product_id")
     private Product product;
-    private BigDecimal amount;
-    private BigDecimal price;
-    private String size;
+    private Double amount;
+    private Double price;
+    @OneToOne
+    @JoinColumn(name = "size_id")
+    private Sizes size;
 
 }
