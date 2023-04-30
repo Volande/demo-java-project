@@ -1,7 +1,7 @@
 package com.shklyar.demo.service;
 
-import com.shklyar.demo.dao.OrderDetailRepository;
 import com.shklyar.demo.dao.OrderRepository;
+import com.shklyar.demo.dao.CustomerRepository;
 import com.shklyar.demo.dao.ProductRepository;
 import com.shklyar.demo.dao.UserRepository;
 import com.shklyar.demo.entities.*;
@@ -15,59 +15,52 @@ import java.util.ArrayList;
 public class OrderService {
 
     private ProductRepository productRepository;
-    private OrderDetailRepository orderDetailRepository;
     private OrderRepository orderRepository;
+    private CustomerRepository customerRepository;
     private UserRepository userRepository;
 
     @Autowired
     public OrderService(ProductRepository productRepository,
-                        OrderDetailRepository orderDetailRepository,
+                        OrderRepository orderRepository,
                         UserRepository userRepository,
-                        OrderRepository orderRepository) {
+                        CustomerRepository customerRepository) {
         this.productRepository = productRepository;
-        this.orderDetailRepository = orderDetailRepository;
+        this.orderRepository = orderRepository;
         this.userRepository = userRepository;
-        this.orderRepository=orderRepository;
+        this.customerRepository =customerRepository;
     }
 
-    public void saveOrder(User user, ArrayList<OrderDetails> orderDetailsArray) {
+    public void saveOrder(User user, ArrayList<Order> orderDetailsArray,Customer customer) {
 
         User userOld = userRepository.findByUserId(user.getUserId());
         userOld.setFirstName(user.getFirstName());
         userOld.setLastName(user.getLastName());
-        userOld.setNumberPhone(user.getNumberPhone());
-        userOld.setDepartmentPostOffice(user.getDepartmentPostOffice());
-        userOld.setPostOffice(user.getPostOffice());
-        userRepository.save(userOld);
 
+
+        userRepository.save(userOld);
         Double wholeSum = 0.0;
 
-        Order orderNew = new Order();
+        Customer orderNew = new Customer();
         orderNew.setUser(userOld);
 
-        ArrayList<OrderDetails> orderDetailsArrayNew = new ArrayList<>();
-        for (OrderDetails orderDetails : orderDetailsArray) {
+        ArrayList<Order> orderDetailsArrayNew = new ArrayList<>();
+        for (Order orderDetails : orderDetailsArray) {
             wholeSum += orderDetails.getProduct().getPrice();
 
             Product product = productRepository.findProductById(orderDetails.getProduct().getId());
-            OrderDetails orderDetailsNew = new OrderDetails();
+            Order orderDetailsNew = new Order();
             orderDetailsNew.setProduct(product);
             orderDetailsNew.setPrice(orderDetails.getPrice());
             orderDetailsNew.setSize(orderDetails.getSize());
             orderDetailsNew.setAmount(orderDetails.getProduct().getQuantity());
-            orderDetailRepository.save(orderDetailsNew);
+            orderRepository.save(orderDetailsNew);
 
             orderDetailsArrayNew.add(orderDetailsNew);
 
         }
-        orderNew.setDetails(orderDetailsArrayNew);
+        orderNew.setOrders(orderDetailsArrayNew);
         orderNew.setSum(BigDecimal.valueOf(wholeSum));
         orderNew.setStatus(OrderStatus.NEW);
-        orderRepository.save(orderNew);
-
-
-
+        customerRepository.save(orderNew);
     }
-
-
 }

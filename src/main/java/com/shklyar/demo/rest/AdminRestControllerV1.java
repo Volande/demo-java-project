@@ -1,8 +1,8 @@
 package com.shklyar.demo.rest;
 
-import com.shklyar.demo.dao.OrderDetailRepository;
 import com.shklyar.demo.dao.OrderRepository;
-import com.shklyar.demo.entities.Order;
+import com.shklyar.demo.dao.CustomerRepository;
+import com.shklyar.demo.entities.Customer;
 import com.shklyar.demo.entities.User;
 import com.shklyar.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +13,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/admin/")
 public class AdminRestControllerV1 {
 
-    @Autowired
+
     private UserService userService;
+    private CustomerRepository customerRepository;
     private OrderRepository orderRepository;
-    private OrderDetailRepository orderDetailRepository;
+    @Autowired
+    public AdminRestControllerV1(UserService userService,
+                                 CustomerRepository customerRepository,
+                                 OrderRepository orderRepository
+                                 ){
+        this.userService=userService;
+        this.customerRepository =customerRepository;
+    }
 
     @GetMapping(value = "users/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable(name = "userId") Long userId) {
@@ -37,8 +44,8 @@ public class AdminRestControllerV1 {
     }
 
     @GetMapping(value = "orderAll")
-    public ResponseEntity<List<Order>> getOrderAll() {
-        List<Order> orderArrayList = orderRepository.findAll();
+    public ResponseEntity<List<Customer>> getOrderAll() {
+        List<Customer> orderArrayList = customerRepository.findAll();
 
         return new ResponseEntity<>(orderArrayList, HttpStatus.OK);
     }

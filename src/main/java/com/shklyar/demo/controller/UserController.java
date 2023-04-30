@@ -1,10 +1,8 @@
 package com.shklyar.demo.controller;
 
-import com.shklyar.demo.dao.OrderDetailRepository;
-import com.shklyar.demo.dao.OrderRepository;
 import com.shklyar.demo.dto.ClientUserDTO;
+import com.shklyar.demo.entities.Customer;
 import com.shklyar.demo.entities.Order;
-import com.shklyar.demo.entities.OrderDetails;
 import com.shklyar.demo.entities.Product;
 import com.shklyar.demo.entities.User;
 import com.shklyar.demo.security.jwt.JwtTokenProvider;
@@ -61,11 +59,12 @@ public class UserController {
 
     @PostMapping(value = "/orderClothes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> orderClothes(
-            @RequestPart("user") User user,
-            @RequestPart("orderDetails") ArrayList<OrderDetails> orderDetails
-    ) {
+            @RequestPart(value = "user", required = false) User user,
+            @RequestPart("orderDetails") ArrayList<Order> orderDetails,
+            @RequestPart("customer")Customer customer
+            ) {
 
-        orderService.saveOrder(user,orderDetails);
+        orderService.saveOrder(user,orderDetails,customer);
 
 
         return new ResponseEntity<>(HttpStatus.OK);

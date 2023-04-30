@@ -45,7 +45,6 @@ public class ProductController {
                              CategoryRepository categoryRepository,
                              CollectionRepository collectionRepository,
                              SizesRepository sizesRepository,
-
                              ProductService productService,
                              CollectionService collectionService,
                              SizesService sizesService,

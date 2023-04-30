@@ -4,16 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "order")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -22,23 +17,16 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @CreationTimestamp
-    private LocalDateTime created;
-
-    @UpdateTimestamp
-    private LocalDateTime update;
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-    private BigDecimal sum;
-    private String address;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<OrderDetails> details;
-
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    @JoinColumn( name = "customer_id")
+    private Customer order;
+    @ManyToOne
+    @JoinColumn( name = "product_id")
+    private Product product;
+    private Double amount;
+    private Double price;
+    @OneToOne
+    @JoinColumn(name = "size_id")
+    private Sizes size;
 
 }
