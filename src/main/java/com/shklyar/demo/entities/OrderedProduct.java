@@ -8,18 +8,17 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "order")
+@Table(name = "ordered_product")
 @Getter
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Order {
+public class OrderedProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @ManyToOne
-    @JoinColumn( name = "customer_id")
-    private Customer order;
+    private Customer customer;
     @ManyToOne
     @JoinColumn( name = "product_id")
     private Product product;

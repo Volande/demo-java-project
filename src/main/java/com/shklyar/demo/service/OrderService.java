@@ -27,12 +27,72 @@ public class OrderService {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
-        this.customerRepository =customerRepository;
+        this.customerRepository = customerRepository;
     }
 
-    public void saveOrder(User user, ArrayList<Order> orderDetailsArray,Customer customer) {
+    public void saveOrder(User user, ArrayList<OrderedProduct> ordersArray, Customer customer) {
+        Double wholeSum = 0.0;
 
-        User userOld = userRepository.findByUserId(user.getUserId());
+
+       if(user.getUserId() != null) {
+            User userOld= userRepository.findByUserId(user.getUserId());
+            userOld.setFirstName(customer.getFirstName());
+            userOld.setLastName(customer.getLastName());
+            userOld.setNumberPhone(customer.getNumberPhone());
+            userOld.setPostOffice(customer.getPostOffice());
+            userOld.setDepartmentPostOffice(customer.getDepartmentPostOffice());
+            userRepository.save(userOld);
+            customer.setUser(userOld);
+        }
+
+        ArrayList<OrderedProduct> ordersArrayNew = new ArrayList<>();
+        for (OrderedProduct orderedProduct : ordersArray) {
+            wholeSum += orderedProduct.getProduct().getPrice();
+
+            Product product = productRepository.findProductById(orderedProduct.getProduct().getId());
+            OrderedProduct ordersNew = new OrderedProduct();
+            ordersNew.setProduct(product);
+            ordersNew.setPrice(orderedProduct.getPrice());
+            ordersNew.setSize(orderedProduct.getSize());
+            ordersNew.setAmount(orderedProduct.getProduct().getQuantity());
+            orderRepository.save(ordersNew);
+            ordersArrayNew.add(ordersNew);
+
+        }
+
+        customer.setOrders(ordersArrayNew);
+        customer.setSum(BigDecimal.valueOf(wholeSum));
+        customer.setStatus(OrderStatus.NEW);
+
+        customerRepository.save(customer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*User userOld = userRepository.findByUserId(user.getUserId());
         userOld.setFirstName(user.getFirstName());
         userOld.setLastName(user.getLastName());
 
@@ -61,6 +121,6 @@ public class OrderService {
         orderNew.setOrders(orderDetailsArrayNew);
         orderNew.setSum(BigDecimal.valueOf(wholeSum));
         orderNew.setStatus(OrderStatus.NEW);
-        customerRepository.save(orderNew);
+        customerRepository.save(orderNew);*/
     }
 }

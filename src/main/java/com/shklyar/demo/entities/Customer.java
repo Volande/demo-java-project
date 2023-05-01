@@ -53,7 +53,7 @@ public class Customer {
     private String departmentPostOffice;
 
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    private List<Order> orders;
+    private List<OrderedProduct> orders;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

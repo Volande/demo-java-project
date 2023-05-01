@@ -47,6 +47,15 @@ public class User implements UserDetails
    @JoinColumn(name = "user_role")
    private Role role;
 
+   @NonNull
+   @Size(max = 20)
+   private String postOffice;
+   @NonNull
+   @Size(max = 20)
+   private String numberPhone;
+   @NonNull
+   @Size(max = 20)
+   private String departmentPostOffice;
 
 
    @OneToOne(cascade = CascadeType.REMOVE)

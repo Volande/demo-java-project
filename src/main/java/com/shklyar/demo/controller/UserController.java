@@ -2,7 +2,7 @@ package com.shklyar.demo.controller;
 
 import com.shklyar.demo.dto.ClientUserDTO;
 import com.shklyar.demo.entities.Customer;
-import com.shklyar.demo.entities.Order;
+import com.shklyar.demo.entities.OrderedProduct;
 import com.shklyar.demo.entities.Product;
 import com.shklyar.demo.entities.User;
 import com.shklyar.demo.security.jwt.JwtTokenProvider;
@@ -60,7 +60,7 @@ public class UserController {
     @PostMapping(value = "/orderClothes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> orderClothes(
             @RequestPart(value = "user", required = false) User user,
-            @RequestPart("orderDetails") ArrayList<Order> orderDetails,
+            @RequestPart("orderDetails") ArrayList<OrderedProduct> orderDetails,
             @RequestPart("customer")Customer customer
             ) {
 
