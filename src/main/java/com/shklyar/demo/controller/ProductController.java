@@ -2,23 +2,25 @@ package com.shklyar.demo.controller;
 
 import com.shklyar.demo.dao.*;
 import com.shklyar.demo.entities.*;
+import com.shklyar.demo.entities.Collection;
 import com.shklyar.demo.service.CategoryService;
 import com.shklyar.demo.service.CollectionService;
 import com.shklyar.demo.service.ProductService;
 import com.shklyar.demo.service.SizesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.http.HttpResponse;
+import java.util.*;
 
 @Controller
 @RequestMapping("/products")
@@ -37,18 +39,20 @@ public class ProductController {
 
     SizesService sizesService;
     CategoryService categoryService;
+    ProductInformationRepository productInformationRepository;
 
 
     @Autowired
     public ProductController(
-                             ProductRepository productRepository,
-                             CategoryRepository categoryRepository,
-                             CollectionRepository collectionRepository,
-                             SizesRepository sizesRepository,
-                             ProductService productService,
-                             CollectionService collectionService,
-                             SizesService sizesService,
-                             CategoryService categoryService) {
+            ProductRepository productRepository,
+            CategoryRepository categoryRepository,
+            CollectionRepository collectionRepository,
+            SizesRepository sizesRepository,
+            ProductService productService,
+            CollectionService collectionService,
+            SizesService sizesService,
+            CategoryService categoryService,
+            ProductInformationRepository productInformationRepository) {
         this.productService = productService;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
@@ -57,19 +61,45 @@ public class ProductController {
         this.sizesRepository = sizesRepository;
         this.sizesService = sizesService;
         this.categoryService = categoryService;
+        this.productInformationRepository = productInformationRepository;
     }
 
 
     @GetMapping(value = "/clothes/{id}")
-    public ResponseEntity<Product> findAllProducts(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Product> findProductById(@PathVariable(name = "id") Long id,
+                                                   @RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE) String language) {
         Product product = productRepository.findProductById(id);
+        List<ProductInformation> productInformationList = new ArrayList<ProductInformation>() ;
+
+        for (ProductInformation productInformation:product.getProductInformation()){
+            if(productInformation.getLanguage().equals(language)){
+
+                productInformationList.add(productInformation);
+            }
+        }
+        product.setProductInformation(productInformationList);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @GetMapping("/")
     public @ResponseBody
-    ResponseEntity<List<Product>> findAllProducts() {
-        return new ResponseEntity<>(productService.findAllProducts(), HttpStatus.OK);
+    ResponseEntity<List<Product>> findAllProducts(@RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE) String language) {
+        List<Product> productList = productRepository.findAll();
+
+
+
+        for(Product product:productList){
+            List<ProductInformation> productInformationList = new ArrayList<ProductInformation>() ;
+
+            for (ProductInformation productInformation:product.getProductInformation()){
+                if(productInformation.getLanguage().equals(language)){
+
+                    productInformationList.add(productInformation);
+                }
+            }
+            product.setProductInformation(productInformationList);
+        }
+        return new ResponseEntity<>(productList, HttpStatus.OK);
     }
 
     @GetMapping("/categories")
@@ -112,10 +142,9 @@ public class ProductController {
     @PostMapping("/filter")
     @ResponseBody
     public ResponseEntity<List<Product>> findProduct(@RequestBody String title) {
-        List<Product> product = productService.findProduct(title);
-        return new ResponseEntity<>(product, HttpStatus.OK);
+        List<Product> products = productService.findProduct(title);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
-
 
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

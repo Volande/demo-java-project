@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.persistence.FetchType;
 import javax.persistence.criteria.*;
 import java.util.*;
 
@@ -254,6 +255,8 @@ public class ProductService {
                 }
 
 
+
+
                 if (map.get("availability") != "" && map.containsKey("availability")) {
 
 
@@ -299,7 +302,7 @@ public class ProductService {
                 }
 
 
-                return criteriaBuilder.and(productPredicateList.toArray(new Predicate[0]));
+                return  (criteriaBuilder.and(productPredicateList.toArray(new Predicate[0])));
             }
 
 

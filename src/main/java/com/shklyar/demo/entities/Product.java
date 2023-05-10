@@ -19,18 +19,22 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String title;
-    private Double price;
+
 
     private String availability;
-    private String content;
-    private String compound;
+
     private Double quantity = 1.0;
 
     @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    @JoinColumn(name = "product_id")
+    private List<ProductInformation> productInformation;
+
+    @OneToMany(cascade=CascadeType.ALL)
     @OrderBy("id ASC")
     @JoinColumn(name = "products_id")
     private List<Images> image;
+
+    private Double price;
 
 
     @ManyToMany(fetch = FetchType.LAZY,
