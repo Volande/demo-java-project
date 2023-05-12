@@ -1,6 +1,10 @@
 package com.shklyar.demo.entities;
 
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -25,8 +29,7 @@ public class Product {
 
     private Double quantity = 1.0;
 
-    @OneToMany(fetch = FetchType.EAGER,cascade=CascadeType.ALL)
-    @JoinColumn(name = "product_id")
+    @OneToMany(mappedBy = "product",fetch = FetchType.EAGER,cascade =CascadeType.ALL)
     private List<ProductInformation> productInformation;
 
     @OneToMany(cascade=CascadeType.ALL)
@@ -67,8 +70,7 @@ public class Product {
     private List<Category> categories = new ArrayList<Category>();
 
 
-    @ManyToOne(fetch = FetchType.EAGER,
-            cascade =
+    @ManyToOne(cascade =
                     {
                             CascadeType.DETACH,
                             CascadeType.MERGE,
@@ -77,6 +79,7 @@ public class Product {
                     },
             targetEntity = Collection.class)
     @JoinColumn(name = "collection_id")
+    @Fetch(FetchMode.SELECT)
     private Collection collection;
 
 

@@ -21,14 +21,14 @@ public class CategoryService {
     public Category initCategory(String category) {
 
 
-        Category categories = categoryRepository.getCategoryByTitle(category);
+    /*    Category categories = categoryRepository.getCategoryByTitle(category);
 
         if (categories == null) {
             categories = new Category();
             categories.setTitle(category);
             categoryRepository.save(categories);
-        }
+        }*/
 
-        return categories;
+        return null;
     }
 }

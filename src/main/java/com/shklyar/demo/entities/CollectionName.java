@@ -9,22 +9,20 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "product_information")
+@Table(name = "collection_name")
 @Getter
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class ProductInformation {
+public class CollectionName {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String availability;
-    private String content;
-    private String compound;
-    private String language;
+
     private String title;
+    private String language;
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @JoinColumn(name = "collection_id")
+    private Collection collection;
 }

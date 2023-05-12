@@ -21,14 +21,14 @@ public class CollectionService {
     public Collection initCollection(String collection) {
 
 
-        Collection newCollection = collectionRepository.getByTitle(collection);
+        //  Collection newCollection = collectionRepository.getByTitle(collection);
 
-        if (newCollection == null) {
-            newCollection = new Collection();
-            newCollection.setTitle(collection);
-            collectionRepository.save(newCollection);
-        }
+//        if (newCollection == null) {
+        //          newCollection = new Collection();
+        //  newCollection.setTitle(collection);
+        //      collectionRepository.save(newCollection);
+        //    }
 
-        return newCollection;
+        return null;
     }
 }

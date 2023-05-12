@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,10 +77,10 @@ public class ProductService {
     public Product saveProduct(Product product) {
 
         for (int i = 0; i < product.getCategories().size(); i++) {
-            product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
+           // product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
         }
 
-        product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
+        //product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
         for (int i = 0; i < product.getSize().size(); i++) {
             product.getSize().set(i, sizesService.initSize(product.getSize().get(i).getTitle()));
@@ -207,6 +208,45 @@ public class ProductService {
         productListNew.addAll(set);
 
         return productListNew;
+    }
+
+    public List<Product> checkByLanguage(String language,List<Product> productList){
+        for(Product product:productList){
+            List<ProductInformation> productInformationList = new ArrayList<ProductInformation>() ;
+
+            for (ProductInformation productInformation:product.getProductInformation()){
+                if(productInformation.getLanguage().equals(language)){
+
+                    productInformationList.add(productInformation);
+                }
+            }
+
+
+            product.setProductInformation(productInformationList);
+
+
+            for(Category category:product.getCategories()){
+                List<Category> categoryList=new ArrayList<>();
+                List<CategoryName> categoryNameList=new ArrayList<>();
+                for(CategoryName categoryName:category.getCategoryNames()){
+                    if(categoryName.getLanguage().equals(language)){
+                        categoryNameList.add(categoryName);
+                    }
+
+                    category.setCategoryNames(categoryNameList);
+                }
+                categoryList.add(category);
+                product.setCategories(categoryList);
+            }
+
+            for(CollectionName collectionName:product.getCollection().getCollectionNames()){
+                if(collectionName.getLanguage().equals(language)){
+                    product.getCollection().setCollectionNames(Collections.singletonList(collectionName));
+                }
+            }
+
+        }
+        return productList;
     }
 
     public Specification<Product> mapProduct(String string) throws JsonProcessingException {

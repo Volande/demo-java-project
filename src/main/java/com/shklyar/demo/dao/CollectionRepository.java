@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface CollectionRepository extends JpaRepository<Collection, Long>, JpaSpecificationExecutor<Collection> {
 
-    public Collection getByTitle(String title);
+  //  public Collection getByTitle(String title);
 }

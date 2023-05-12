@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,16 +23,15 @@ public class Collection {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String title;
+
+    @OneToMany(mappedBy = "collection",fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    private List<CollectionName> collectionNames;
 
     @JsonBackReference
     @OneToMany(mappedBy = "collection")
     private Set<Product> products = new HashSet<>();
 
-    public Collection(String title){
-        this.title=title;
 
-    }
 
 
 }

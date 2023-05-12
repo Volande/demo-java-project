@@ -87,25 +87,31 @@ public class ProductController {
         List<Product> productList = productRepository.findAll();
 
 
+        productList=  this.productService.checkByLanguage(language,productList);
 
-        for(Product product:productList){
-            List<ProductInformation> productInformationList = new ArrayList<ProductInformation>() ;
-
-            for (ProductInformation productInformation:product.getProductInformation()){
-                if(productInformation.getLanguage().equals(language)){
-
-                    productInformationList.add(productInformation);
-                }
-            }
-            product.setProductInformation(productInformationList);
-        }
-        return new ResponseEntity<>(productList, HttpStatus.OK);
+        return new ResponseEntity<>( productList,HttpStatus.OK);
     }
 
     @GetMapping("/categories")
     public @ResponseBody
-    ResponseEntity<List<Category>> findAllCategory() {
-        return new ResponseEntity<>(categoryRepository.findAll(), HttpStatus.OK);
+    ResponseEntity<List<Category>> findAllCategory(@RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE) String language) {
+
+        List<Category> categories = categoryRepository.findAll();
+        List<Category> categoriesForRequest = new ArrayList<>();
+
+        for(Category category:categories){
+            List<CategoryName> categoryNameForRequest = new ArrayList<>();
+            for(CategoryName categoryName:category.getCategoryNames()){
+                if( categoryName.getLanguage().equals(language)){
+                    categoryNameForRequest.add(categoryName);
+                }
+            }
+            category.setCategoryNames(categoryNameForRequest);
+            categoriesForRequest.add(category);
+        }
+
+
+        return new ResponseEntity<>( categoriesForRequest,HttpStatus.OK);
     }
 
     @GetMapping("/collection")
@@ -123,13 +129,13 @@ public class ProductController {
     @PostMapping("/newCategory")
     public @ResponseBody
     ResponseEntity<Category> saveNewCategory(Category category) {
-        return new ResponseEntity<>(categoryService.initCategory(category.getTitle()), HttpStatus.OK);
+        return new ResponseEntity<>( HttpStatus.OK);
     }
 
     @PostMapping("/newCollection")
     public @ResponseBody
     ResponseEntity<Collection> saveNewCollection(Collection collection) {
-        return new ResponseEntity<>(collectionService.initCollection(collection.getTitle()), HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/newSize")

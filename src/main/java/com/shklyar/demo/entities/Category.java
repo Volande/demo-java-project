@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -20,15 +21,13 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String title;
+
+    @OneToMany(mappedBy = "categories",fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    private List<CategoryName> categoryNames;
 
     @JsonBackReference
     @ManyToMany(mappedBy = "categories")
     private Set<Product> products = new HashSet<>();
 
-    public Category(
-            String title
-    ) {
-        this.title = title;
-    }
+
 }
