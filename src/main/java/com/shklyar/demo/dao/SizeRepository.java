@@ -1,18 +1,12 @@
 package com.shklyar.demo.dao;
 
 
-import com.shklyar.demo.entities.Sizes;
+import com.shklyar.demo.entities.Size;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-import java.util.List;
+public interface SizeRepository extends JpaRepository<Size, Long>, JpaSpecificationExecutor<Size> {
 
-public interface SizeRepository extends JpaRepository<Sizes, Long>, JpaSpecificationExecutor<Sizes> {
-
-    public Sizes getByTitle(String title);
-
-
-
-
+    public Size findTopByTitle(String title);
 
 }

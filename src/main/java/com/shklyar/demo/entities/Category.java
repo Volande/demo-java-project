@@ -23,6 +23,7 @@ public class Category {
     private Long id;
 
     @OneToMany(mappedBy = "categories",fetch = FetchType.EAGER,cascade=CascadeType.ALL)
+    @OrderBy("id ASC")
     private List<CategoryName> categoryNames;
 
     @JsonBackReference

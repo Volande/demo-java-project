@@ -2,10 +2,7 @@ package com.shklyar.demo.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.shklyar.demo.dao.CategoryRepository;
-import com.shklyar.demo.dao.ImageRepository;
-import com.shklyar.demo.dao.ProductRepository;
-import com.shklyar.demo.dao.SizeRepository;
+import com.shklyar.demo.dao.*;
 import com.shklyar.demo.entities.*;
 import com.shklyar.demo.entities.Collection;
 import net.bytebuddy.utility.RandomString;
@@ -13,15 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import javax.persistence.FetchType;
 import javax.persistence.criteria.*;
+import javax.validation.constraints.Null;
 import java.util.*;
 
 
@@ -33,12 +29,28 @@ public class ProductService {
                           ImageService imageService,
                           CollectionService collectionService,
                           SizesService sizesService,
-                          CategoryService categoryService) {
+                          CategoryService categoryService,
+                          ProductInformationRepository productInformationRepository,
+                          ProductInformationService productInformationService,
+                          AvailabilityRepository availabilityRepository,
+                          AvailabilityNameRepository availabilityNameRepository,
+                          CollectionRepository collectionRepository,
+                          CollectionNameRepository collectionNameRepository,
+                          CategoryRepository categoryRepository,
+                          CategoryNameRepository categoryNameRepository) {
         this.productRepository = productRepository;
         this.imageService = imageService;
         this.collectionService = collectionService;
         this.sizesService = sizesService;
         this.categoryService = categoryService;
+        this.productInformationService = productInformationService;
+        this.productInformationRepository = productInformationRepository;
+        this.availabilityRepository = availabilityRepository;
+        this.availabilityNameRepository = availabilityNameRepository;
+        this.collectionRepository = collectionRepository;
+        this.collectionNameRepository = collectionNameRepository;
+        this.categoryRepository = categoryRepository;
+        this.categoryNameRepository = categoryNameRepository;
     }
 
     @Value("${imageCloudDirectory}")
@@ -58,11 +70,15 @@ public class ProductService {
     public boolean availability;
 
     public ArrayList<Object> arrayList = new ArrayList<>();
-    SizeRepository sizeRepository;
-    CategoryRepository categoryRepository;
-    ProductRepository productRepository;
 
-    ImageRepository imageRepository;
+    ProductRepository productRepository;
+    ProductInformationRepository productInformationRepository;
+    AvailabilityNameRepository availabilityNameRepository;
+    AvailabilityRepository availabilityRepository;
+    CollectionRepository collectionRepository;
+    CollectionNameRepository collectionNameRepository;
+    CategoryRepository categoryRepository;
+    CategoryNameRepository categoryNameRepository;
 
 
     SizesService sizesService;
@@ -72,15 +88,11 @@ public class ProductService {
     CollectionService collectionService;
 
     ImageService imageService;
+    ProductInformationService productInformationService;
 
 
     public Product saveProduct(Product product) {
 
-        for (int i = 0; i < product.getCategories().size(); i++) {
-           // product.getCategories().set(i, categoryService.initCategory(product.getCategories().get(i).getTitle()));
-        }
-
-        //product.setCollection(collectionService.initCollection(product.getCollection().getTitle()));
 
         for (int i = 0; i < product.getSize().size(); i++) {
             product.getSize().set(i, sizesService.initSize(product.getSize().get(i).getTitle()));
@@ -90,7 +102,12 @@ public class ProductService {
         if (product.getImage() != null) {
             for (int i = 0; i < product.getImage().size(); i++) {
                 product.getImage().set(i, imageService.initImages(product.getImage().get(i).getTitle()));
+
             }
+        }
+
+        for (int i = 0; i < product.getProductInformation().size(); i++) {
+            product.getProductInformation().set(i, productInformationService.initProductInformation(product.getProductInformation().get(i)));
         }
 
 
@@ -122,27 +139,34 @@ public class ProductService {
         return true;
     }
 
-    public boolean saveProductAndEnrollImage(Product product, List<MultipartFile> multipartFile) {
+    public boolean saveProductAndEnrollImage(Product product, String availabilityName, List<String> categoryNames,
+                                             String collectionName, List<MultipartFile> multipartFile) {
 
         List<Images> list = new ArrayList<>();
-        List<Category> categoryList = product.getCategories();
-        List<Sizes> sizesList = product.getSize();
-        Collection collection = product.getCollection();
+        List<Category> categoryList = new ArrayList<>();
 
-        product.setCollection(null);
-        product.setSize(new ArrayList<>());
-        product.setCategories(new ArrayList<>());
+
+        product.setAvailability(availabilityRepository.getByAvailabilityNames(availabilityNameRepository.getByTitle(availabilityName)));
+
+
+        product.setCollection(collectionRepository.getByCollectionNames(collectionNameRepository.getByTitle(collectionName)));
+
+        for (String categoryName : categoryNames) {
+            categoryList.add(categoryRepository.getByCategoryNames(categoryNameRepository.getByTitle(categoryName)));
+        }
+
+        product.setCategories(categoryList);
+
+
+        saveProduct(product);
 
         if (product.getImage() != null) {
             changeOrderImages(product);
         }
 
-        product.setCategories(categoryList);
-        product.setCollection(collection);
-        product.setSize(sizesList);
-
-
-        saveProduct(product);
+        for (ProductInformation productInformation : product.getProductInformation()) {
+            productInformation.setProduct(product);
+        }
 
         if (multipartFile != null) {
             for (int i = 0; i < multipartFile.size(); i++) {
@@ -210,26 +234,16 @@ public class ProductService {
         return productListNew;
     }
 
-    public List<Product> checkByLanguage(String language,List<Product> productList){
-        for(Product product:productList){
-            List<ProductInformation> productInformationList = new ArrayList<ProductInformation>() ;
-
-            for (ProductInformation productInformation:product.getProductInformation()){
-                if(productInformation.getLanguage().equals(language)){
-
-                    productInformationList.add(productInformation);
-                }
-            }
+    public List<Product> checkByLanguage(String language, List<Product> productList) {
+        for (Product product : productList) {
+            List<ProductInformation> productInformationList = new ArrayList<ProductInformation>();
 
 
-            product.setProductInformation(productInformationList);
-
-
-            for(Category category:product.getCategories()){
-                List<Category> categoryList=new ArrayList<>();
-                List<CategoryName> categoryNameList=new ArrayList<>();
-                for(CategoryName categoryName:category.getCategoryNames()){
-                    if(categoryName.getLanguage().equals(language)){
+            for (Category category : product.getCategories()) {
+                List<Category> categoryList = new ArrayList<>();
+                List<CategoryName> categoryNameList = new ArrayList<>();
+                for (CategoryName categoryName : category.getCategoryNames()) {
+                    if (categoryName.getLanguage().equals(language)) {
                         categoryNameList.add(categoryName);
                     }
 
@@ -239,8 +253,8 @@ public class ProductService {
                 product.setCategories(categoryList);
             }
 
-            for(CollectionName collectionName:product.getCollection().getCollectionNames()){
-                if(collectionName.getLanguage().equals(language)){
+            for (CollectionName collectionName : product.getCollection().getCollectionNames()) {
+                if (collectionName.getLanguage().equals(language)) {
                     product.getCollection().setCollectionNames(Collections.singletonList(collectionName));
                 }
             }
@@ -248,6 +262,7 @@ public class ProductService {
         }
         return productList;
     }
+
 
     public Specification<Product> mapProduct(String string) throws JsonProcessingException {
 
@@ -275,13 +290,15 @@ public class ProductService {
 
                 if (map.get("minPrice") != "" || map.get("maxPrice") != "") {
                     if (map.containsKey("minPrice") && map.containsKey("maxPrice")) {
-                        if(map.get("minPrice") != "" ){
+                        if (map.get("minPrice") != "") {
                             minPrice = Double.parseDouble((String) map.get("minPrice"));
-                        };
+                        }
+                        ;
 
-                        if(map.get("maxPrice") != ""){
+                        if (map.get("maxPrice") != "") {
                             maxPrice = Double.parseDouble((String) map.get("maxPrice"));
-                        };
+                        }
+                        ;
                         productPredicateList.add(criteriaBuilder.between(root.get("price"), new Double(minPrice), new Double(maxPrice)));
                     } else if (map.containsKey("minPrice") && !map.containsKey("maxPrice")) {
                         minPrice = Double.parseDouble((String) map.get("minPrice"));
@@ -295,23 +312,30 @@ public class ProductService {
                 }
 
 
-
-
                 if (map.get("availability") != "" && map.containsKey("availability")) {
 
+                    Map availability = (Map) map.get("availability");
 
-                    productPredicateList.add(criteriaBuilder.equal(root.get("availability"), map.get("availability")));
+                    productPredicateList.add(criteriaBuilder.equal(root.get("availability").get("id"),availability.get("id")));
 
                 }
 
                 if (map.containsKey("categories")) {
-                    Join<Product, Category> predicateCategory = root.join("categories");
-
-                    ArrayList<String> categories = (ArrayList<String>) map.get("categories");
+                    ArrayList<Map> categories = (ArrayList<Map>) map.get("categories");
 
 
                     if (categories.size() > 0) {
-                        productPredicateList.add(predicateCategory.get("title").in(categories));
+                        ArrayList<Integer> categoryIds = new ArrayList<>();
+
+
+                        for(Map map1:categories){
+                            categoryIds.add((Integer) map1.get("id"));
+
+                        }
+                        Join<Product, Category> predicateCategory = root.join("categories");
+
+
+                        productPredicateList.add(predicateCategory.get("id").in(categoryIds));
                     }
                 }
 
@@ -321,7 +345,7 @@ public class ProductService {
 
                 if (map.containsKey("size")) {
 
-                    Join<Product, Sizes> predicateSize = root.join("size");
+                    Join<Product, Size> predicateSize = root.join("size");
 
                     ArrayList<String> size = (ArrayList<String>) map.get("size");
 
@@ -333,16 +357,28 @@ public class ProductService {
 
 
                 if (map.containsKey("collection")) {
-                    Join<Product, Collection> predicateCollection = root.join("collection");
-                    ArrayList<String> collections = (ArrayList<String>) map.get("collection");
-                    if (collections.size() > 0) {
-                        productPredicateList.add(predicateCollection.get("title").in(collections));
+
+                    ArrayList<Map> collection = (ArrayList<Map>) map.get("collection");
+
+
+                    if (collection.size() > 0) {
+                        ArrayList<Integer> collectionIds = new ArrayList<>();
+
+
+                        for(Map map1:collection){
+                            collectionIds.add((Integer) map1.get("id"));
+
+                        }
+                        Join<Product, Collection> predicateCollection = root.join("collection");
+
+
+                        productPredicateList.add(predicateCollection.get("id").in(collectionIds));
                     }
 
                 }
 
 
-                return  (criteriaBuilder.and(productPredicateList.toArray(new Predicate[0])));
+                return (criteriaBuilder.and(productPredicateList.toArray(new Predicate[0])));
             }
 
 

@@ -3,11 +3,8 @@ package com.shklyar.demo.entities;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +22,10 @@ public class Product {
     private Long id;
 
 
-    private String availability;
-
     private Double quantity = 1.0;
 
     @OneToMany(mappedBy = "product",fetch = FetchType.EAGER,cascade =CascadeType.ALL)
+    @OrderBy("id ASC")
     private List<ProductInformation> productInformation;
 
     @OneToMany(cascade=CascadeType.ALL)
@@ -48,11 +44,11 @@ public class Product {
                             CascadeType.REFRESH,
                             CascadeType.PERSIST
                     },
-            targetEntity = Sizes.class)
+            targetEntity = Size.class)
     @JoinTable(name = "produts_size",
             joinColumns = @JoinColumn(name = "products_id"),
             inverseJoinColumns = @JoinColumn(name = "size_id"))
-    private List<Sizes> size = new ArrayList<Sizes>();
+    private List<Size> size = new ArrayList<Size>();
 
 
     @ManyToMany(fetch = FetchType.LAZY,
@@ -81,9 +77,20 @@ public class Product {
     @JoinColumn(name = "collection_id")
     @Fetch(FetchMode.SELECT)
     private Collection collection;
+    @ManyToOne(cascade =
+            {
+                    CascadeType.DETACH,
+                    CascadeType.MERGE,
+                    CascadeType.REFRESH,
+                    CascadeType.PERSIST
+            },
+            targetEntity = Availability.class)
+    @JoinColumn(name = "availability_id")
+    @Fetch(FetchMode.SELECT)
+    private Availability availability;
 
 
-    public void addSizes(Sizes sizes) {
+    public void addSizes(Size sizes) {
         size.add(sizes);
         sizes.getProducts().add(this);
 

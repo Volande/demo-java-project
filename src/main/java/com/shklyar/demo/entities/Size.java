@@ -8,31 +8,31 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "collection")
+@Table(name = "size")
 @Getter
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Collection {
+public class Size {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @OneToMany(mappedBy = "collection",fetch = FetchType.EAGER,cascade=CascadeType.ALL)
-    @OrderBy("id ASC")
-    private List<CollectionName> collectionNames;
+    @Column(unique = true)
+    private String title;
 
     @JsonBackReference
-    @OneToMany(mappedBy = "collection")
+    @ManyToMany(mappedBy = "size")
     private Set<Product> products = new HashSet<>();
 
-
+    public Size(
+            String title
+    ) {
+        this.title = title;
+    }
 
 
 }

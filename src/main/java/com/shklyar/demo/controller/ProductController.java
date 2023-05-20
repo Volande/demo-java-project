@@ -12,14 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.http.HttpResponse;
 import java.util.*;
 
 @Controller
@@ -35,11 +31,12 @@ public class ProductController {
 
     CollectionRepository collectionRepository;
 
-    SizesRepository sizesRepository;
+    SizeRepository sizeRepository;
 
     SizesService sizesService;
     CategoryService categoryService;
     ProductInformationRepository productInformationRepository;
+    AvailabilityRepository availabilityRepository;
 
 
     @Autowired
@@ -47,37 +44,31 @@ public class ProductController {
             ProductRepository productRepository,
             CategoryRepository categoryRepository,
             CollectionRepository collectionRepository,
-            SizesRepository sizesRepository,
+            SizeRepository sizeRepository,
             ProductService productService,
             CollectionService collectionService,
             SizesService sizesService,
             CategoryService categoryService,
-            ProductInformationRepository productInformationRepository) {
+            ProductInformationRepository productInformationRepository,
+            AvailabilityRepository availabilityRepository) {
         this.productService = productService;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.collectionRepository = collectionRepository;
         this.collectionService = collectionService;
-        this.sizesRepository = sizesRepository;
+        this.sizeRepository = sizeRepository;
         this.sizesService = sizesService;
         this.categoryService = categoryService;
         this.productInformationRepository = productInformationRepository;
+        this.availabilityRepository = availabilityRepository;
     }
 
 
     @GetMapping(value = "/clothes/{id}")
-    public ResponseEntity<Product> findProductById(@PathVariable(name = "id") Long id,
-                                                   @RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE) String language) {
+    public ResponseEntity<Product> findProductById(@PathVariable(name = "id") Long id) {
         Product product = productRepository.findProductById(id);
-        List<ProductInformation> productInformationList = new ArrayList<ProductInformation>() ;
 
-        for (ProductInformation productInformation:product.getProductInformation()){
-            if(productInformation.getLanguage().equals(language)){
 
-                productInformationList.add(productInformation);
-            }
-        }
-        product.setProductInformation(productInformationList);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
@@ -94,37 +85,36 @@ public class ProductController {
 
     @GetMapping("/categories")
     public @ResponseBody
-    ResponseEntity<List<Category>> findAllCategory(@RequestHeader(value = HttpHeaders.ACCEPT_LANGUAGE) String language) {
+    ResponseEntity<List<Category>> findAllCategory(){
 
         List<Category> categories = categoryRepository.findAll();
-        List<Category> categoriesForRequest = new ArrayList<>();
-
-        for(Category category:categories){
-            List<CategoryName> categoryNameForRequest = new ArrayList<>();
-            for(CategoryName categoryName:category.getCategoryNames()){
-                if( categoryName.getLanguage().equals(language)){
-                    categoryNameForRequest.add(categoryName);
-                }
-            }
-            category.setCategoryNames(categoryNameForRequest);
-            categoriesForRequest.add(category);
-        }
 
 
-        return new ResponseEntity<>( categoriesForRequest,HttpStatus.OK);
+        return new ResponseEntity<>( categories,HttpStatus.OK);
     }
 
     @GetMapping("/collection")
     public @ResponseBody
     ResponseEntity<List<Collection>> findAllCollection() {
-        return new ResponseEntity<>(collectionRepository.findAll(), HttpStatus.OK);
+        List<Collection> collections=collectionRepository.findAll();
+
+        return new ResponseEntity<>(collections, HttpStatus.OK);
+    }
+    @GetMapping("/availability")
+    public @ResponseBody
+    ResponseEntity<List<Availability>> findAllAvailability(){
+        List<Availability> availabilities=availabilityRepository.findAll();
+
+
+        return new ResponseEntity<>(availabilities,HttpStatus.OK);
     }
 
     @GetMapping("/sizes")
     public @ResponseBody
-    ResponseEntity<List<Sizes>> findAllSizes() {
-        return new ResponseEntity<>(sizesRepository.findAll(), HttpStatus.OK);
+    ResponseEntity<List<Size>> findAllSizes() {
+        return new ResponseEntity<>(sizeRepository.findAll(), HttpStatus.OK);
     }
+
 
     @PostMapping("/newCategory")
     public @ResponseBody
@@ -140,7 +130,7 @@ public class ProductController {
 
     @PostMapping("/newSize")
     public @ResponseBody
-    ResponseEntity<Sizes> saveNewSizes(Sizes string) {
+    ResponseEntity<Size> saveNewSizes(Size string) {
         return new ResponseEntity<>(sizesService.initSize(string.getTitle()), HttpStatus.OK);
     }
 
@@ -156,10 +146,13 @@ public class ProductController {
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> saveProduct(
             @RequestPart("clothes") Product product,
+            @RequestPart("availabilityName") String availabilityName,
+            @RequestPart("categoryName") List<String> categoryNames,
+            @RequestPart("collectionName") String collectionName,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFile) {
 
 
-        productService.saveProductAndEnrollImage(product, multipartFile);
+        productService.saveProductAndEnrollImage(product,availabilityName,categoryNames,collectionName, multipartFile);
 
 
         return new ResponseEntity<>(HttpStatus.OK);

@@ -26,6 +26,6 @@ public class OrderedProduct {
     private Double price;
     @OneToOne
     @JoinColumn(name = "size_id")
-    private Sizes size;
+    private Size size;
 
 }
